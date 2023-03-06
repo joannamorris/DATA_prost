@@ -1,0 +1,539 @@
+---
+title: "The N400 effect when singular gendered antecedents are co-indexed with (a)  *himself* or *herself*  (b) *themselves* "
+author: "Joanna Morris"
+date: "`r Sys.Date()`"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+## Overview
+
+This document contains the code to reproduce the statistical analyses described in [Prasad and Morris (2019)](https://psyarxiv.com/hwzke). You can download the data and the original .Rmd file [here](https://osf.io/2vjyp/).
+
+This document has two sections:
+
+
+2.  [Analysis 1: The N400 effect when antecedents are co-indexed with *himself* or *herself*](#gender)
+3.  [Analysis 2: The N400 effect when antecedents are co-indexed with *themselves*](#number)
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, fig.dim = c(4, 3))
+library(knitr)
+library(ggplot2)
+library(ggrepel)
+library(psych)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(pander)
+library(wesanderson)
+library(ez)
+
+```
+
+
+
+## Define functions, set parameters and load
+
+Define standard error of mean function
+
+```{r echo=TRUE}
+sem <- function(x) sd(x)/sqrt(length(x))
+```
+
+Before we begin, let's set some general parameters for `ggplot2`. We will set a general theme using the `theme_set()` function. We will use the 'classic' theme which gives us clean white background rather than the default grey with white grid lines. And we will position the legend at the top of the graph rather than at the right side which is the default.
+
+```{r theme}
+theme_set(theme_classic() +  theme(legend.position = "top")) 
+```
+
+
+```{r}
+prost_2022_singular <- read_csv("prost_2022_singular_n400_nref.csv")
+prost_2022_plural <- read_csv("prost_2022_plural_n400_nref.csv")
+```
+
+Then we re-order factor levels for *Anteriority* & *Referentiality*
+
+```{r}
+prost_2022_singular$Anteriority <- factor(prost_2022_singular$Anteriority, 
+                                            levels=c('Frontal',
+                                                     'FrontoCentral', 
+                                                     'Central', 
+                                                     'CentroParietal', 
+                                                     'Parietal'))
+
+prost_2022_singular$Referentiality <- factor(prost_2022_singular$Referentiality, 
+                                            levels=c('Referential',
+                                                     'NonReferential'))
+levels(prost_2022_singular$Anteriority)
+levels(prost_2022_singular$Referentiality)
+
+prost_2022_plural$Anteriority <- factor(prost_2022_plural$Anteriority, 
+                                            levels=c('Frontal',
+                                                     'FrontoCentral', 
+                                                     'Central', 
+                                                     'CentroParietal', 
+                                                     'Parietal'))
+
+prost_2022_plural$Referentiality <- factor(prost_2022_plural$Referentiality, 
+                                            levels=c('Referential',
+                                                     'NonReferential'))
+levels(prost_2022_plural$Anteriority)
+levels(prost_2022_plural$Referentiality)
+```
+## Analysis 1: The N400 effect when antecedents are co-indexed with *himself* or *herself*
+
+```{r echo=TRUE}
+
+ezANOVA(data = prost_2022_singular
+              , dv = diff_score
+              , wid = SubjID
+              , within = .(Referentiality, Gender_Status, Anteriority)
+              , between = Group
+              , type = 3
+              , return_aov = F
+              )
+```
+
+### Condition Means for Analysis 1
+
+The N400 effect when antecedents are co-indexed with *himself* or *herself*.  
+
+Significant Effects: **Referentiality; Group X Anteriority; Group x Referentiality x Gender Status**
+
+```{r}
+
+kable(singular_means1 <- prost_2022_singular |> 
+  group_by(Referentiality) |>
+  summarise(Mean = mean(diff_score), 
+            SE = sem(diff_score), 
+            SD = sd(diff_score), 
+            Max = max(diff_score), 
+            Min = min(diff_score)), digits = 2)
+
+kable(singular_means2 <- prost_2022_singular |> 
+  group_by(Anteriority, Group) |>
+  summarise(Mean = mean(diff_score), 
+            SE = sem(diff_score), 
+            SD = sd(diff_score), 
+            Max = max(diff_score), 
+            Min = min(diff_score)), digits = 2)
+
+kable(singular_means2 <- prost_2022_singular |> 
+  group_by(Referentiality, Gender_Status,Group) |>
+  summarise(Mean = mean(diff_score), 
+            SE = sem(diff_score), 
+            SD = sd(diff_score), 
+            Max = max(diff_score), 
+            Min = min(diff_score)), digits = 2)
+
+```
+
+### Post-hoc tests for Analysis 1: Group x Gender Status x Referentiality
+
+The following chunk runs post-hoc tests for the 3-way ***"Group x Gender Status x Referentiality"*** Interaction
+
+#### Binary Group. 
+
+These are the post-hoc tests for the *binary* group.
+
+```{r}
+binary <- filter(prost_2022_singular, Group == "Binary")
+
+```
+
+
+"*Some woman...himself*" vs. "*Mary...himself*"  Binary
+
+```{r echo=TRUE}
+pander(t.test(diff_score ~ Referentiality
+       , filter(binary, (Gender_Status == "Gendered"))
+       , paired=TRUE))
+```
+
+ "*Someone...himself*" vs. "*The participant...himself*" Binary
+
+```{r echo=TRUE}
+pander(t.test(diff_score ~ Referentiality
+       , filter(binary, (Gender_Status == "NonGendered"))
+       , paired=TRUE))
+```
+
+"*The participant...himself*" vs. "*Mary...himself*"  Binary
+
+```{r echo=TRUE}
+pander(t.test(diff_score ~ Gender_Status
+       , filter(binary, (Referentiality == "Referential"))
+       , paired=TRUE))
+```
+
+"*Someone...himself*" vs. "*Some woman...himself*"  Binary
+
+```{r echo=TRUE}
+pander(t.test(diff_score ~ Gender_Status
+       , filter(binary, (Referentiality == "NonReferential"))
+       , paired=TRUE))
+```
+
+"*Someone...himself*" vs. "*Mary...himself*"  Binary
+
+```{r echo=TRUE}
+mary_someone <- filter(binary, (Referentiality == "Referential" & Gender_Status == "Gendered") | (Referentiality == "NonReferential" & Gender_Status == "NonGendered"))
+
+pander(t.test(diff_score ~ Gender_Status, mary_someone, paired=TRUE))
+```
+
+ "*Some woman...himself*" vs. "*the participant...himself*"  Binary
+```{r}
+somewoman_theparticipant <-  filter(binary, (Referentiality == "NonReferential" & Gender_Status == "Gendered") | (Referentiality == "Referential" & Gender_Status == "NonGendered"))
+
+pander(t.test(diff_score ~ Gender_Status, somewoman_theparticipant, paired=TRUE))
+```
+
+
+##### Interaction Plots: Group x Gender Status x Referentiality Binary
+&nbsp;
+
+```{r}
+summary_data_1b <- filter(prost_2022_singular, Group == "Binary") |> 
+  group_by(Gender_Status, Referentiality) |>
+  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
+  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
+summary_data_1b$label = c("Mary","some woman", "the participant", "someone")
+
+
+ggplot(summary_data_1b, aes(x = Referentiality, 
+                         y = mean,
+                         ymin = lwr,
+                         ymax = upr,
+                         fill = Gender_Status, 
+                         group = Gender_Status,
+                         label = label)) + 
+  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
+  geom_errorbar(width = .2, position = position_dodge(.9))  +
+  geom_label_repel(show.legend = FALSE, cex = 2) +
+  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+```
+
+&nbsp;
+
+```{r}
+
+ggplot(summary_data_1b, aes(x = Referentiality, 
+                         y = mean,
+                         ymin = lwr,
+                         ymax = upr,
+                         colour = Gender_Status, 
+                         linetype= Gender_Status, 
+                         group = Gender_Status,
+                         label = label)) + 
+  geom_point() + 
+  geom_line() +
+  geom_errorbar(width = .2, position = position_dodge(.025))  +
+  geom_label_repel(show.legend = FALSE, cex = 2)+
+  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+```
+
+
+#### NonBinary Group. 
+
+These are the post-hoc tests for the *NonBinary* group.
+
+```{r}
+nonbinary <- filter(prost_2022_singular, Group == "NonBinary")
+```
+
+
+ "*Some woman...himself*" vs. "*Mary...himself*" NonBinary
+
+```{r echo=TRUE}
+
+pander(t.test(diff_score ~ Referentiality
+       ,filter(prost_2022_singular, (Gender_Status == "Gendered" & Group == "NonBinary"))
+       ,paired=TRUE))
+```
+
+"*Someone...himself*" vs. "*The participant...himself*" NonBinary
+
+```{r  echo=TRUE}
+
+pander(t.test(diff_score ~ Referentiality
+       , filter(prost_2022_singular, (Gender_Status == "NonGendered" & Group == "NonBinary"))
+       , paired=TRUE))
+```
+
+ "*The participant...himself*" vs. "*Mary...himself*" NonBinary
+
+```{r  echo=TRUE}
+pander(t.test(diff_score ~ Gender_Status
+       , filter(prost_2022_singular, (Referentiality == "Referential" & Group == "NonBinary"))
+       , paired=TRUE))
+```
+
+"*Someone...himself*" vs. "*Some woman...himself*"  NonBinary
+
+```{r  echo=TRUE}
+
+pander(t.test(diff_score ~ Gender_Status
+       , filter(prost_2022_singular, (Referentiality == "NonReferential" & Group == "NonBinary"))
+       , paired=TRUE))
+```
+
+
+"*Someone...himself*" vs. "*Mary...himself*"  NonBinary
+
+```{r echo=TRUE}
+mary_someone <- filter(nonbinary, (Referentiality == "Referential" & Gender_Status == "Gendered") | (Referentiality == "NonReferential" & Gender_Status == "NonGendered"))
+
+pander(t.test(diff_score ~ Gender_Status, mary_someone, paired=TRUE))
+```
+
+ "*Some woman...himself*" vs. "*the participant...himself*"  NonBinary
+```{r}
+somewoman_theparticipant <-  filter(nonbinary, (Referentiality == "NonReferential" & Gender_Status == "Gendered") | (Referentiality == "Referential" & Gender_Status == "NonGendered"))
+
+pander(t.test(diff_score ~ Gender_Status, somewoman_theparticipant, paired=TRUE))
+```
+##### Interaction Plots: Group x Gender Status x Referentiality NonBinary
+
+&nbsp;
+
+```{r}
+summary_data_1nb <- filter(prost_2022_singular, Group == "NonBinary") |> 
+  group_by(Gender_Status, Referentiality) |>
+  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
+  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
+summary_data_1nb$label = c("Mary","some woman", "the participant", "someone")
+
+
+ggplot(summary_data_1nb, aes(x = Referentiality, 
+                         y = mean,
+                         ymin = lwr,
+                         ymax = upr,
+                         fill = Gender_Status, 
+                         group = Gender_Status,
+                         label = label)) + 
+  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
+  geom_errorbar(width = .2, position = position_dodge(.9))  +
+  geom_label_repel(show.legend = FALSE, cex = 2)+
+  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+
+```
+
+&nbsp;
+
+```{r}
+
+ggplot(summary_data_1nb, aes(x = Gender_Status, 
+                         y = mean,
+                         ymin = lwr,
+                         ymax = upr,
+                         colour = Referentiality, 
+                         linetype= Referentiality, 
+                         group = Referentiality,
+                         label = label)) + 
+  geom_point() + 
+  geom_line() +
+  geom_errorbar(width = .2, position = position_dodge(.025)) +
+  geom_label_repel(show.legend = FALSE, cex = 2)+
+  scale_color_manual(values=wes_palette(n=3, name="Royal1"))
+```
+
+
+### Post-hoc tests for Analysis 1: Group x Anteriority
+
+The following chunk runs post-hoc tests for the 2-way ***"Group x Anteriority"*** Interaction
+
+```{r echo=TRUE}
+# Binary vs Non-Binary Frontal
+
+pander(t.test(diff_score ~ Group
+       ,dplyr::filter(prost_2022_singular, (Anteriority == "Frontal"))
+       ,paired=FALSE))
+
+# Binary vs Non-Binary FrontoCentral
+
+pander(t.test(diff_score ~ Group
+       ,dplyr::filter(prost_2022_singular, (Anteriority == "FrontoCentral"))
+       ,paired=FALSE))
+
+# Binary vs Non-Binary Central
+
+pander(t.test(diff_score ~ Group
+       ,dplyr::filter(prost_2022_singular, (Anteriority == "Central"))
+       ,paired=FALSE))
+
+# Binary vs Non-Binary CentroParietal
+
+pander(t.test(diff_score ~ Group
+       ,dplyr::filter(prost_2022_singular, (Anteriority == "CentroParietal"))
+       ,paired=FALSE))
+
+# Binary vs Non-Binary Parietal
+
+pander(t.test(diff_score ~ Group
+       ,dplyr::filter(prost_2022_singular, (Anteriority == "Parietal"))
+       ,paired=FALSE))
+```
+
+
+##### Interaction Plot: Group x Anteriority
+
+&nbsp;
+
+   
+```{r}
+summary_data_3 <- prost_2022_singular |> 
+  group_by(Group, Anteriority) |>
+  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
+  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
+
+ggplot(summary_data_3, aes(x = Anteriority, 
+                         y = mean,
+                         ymin = lwr,
+                         ymax = upr,
+                         colour = Group, 
+                         linetype= Group, 
+                         group = Group)) + 
+  geom_point() + 
+  geom_line() +
+  geom_errorbar(width = .3, position = position_dodge(.1)) +
+  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+```
+
+
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+
+
+## Analysis 2: The N400 effect when antecedents are co-indexed with *themselves*
+
+
+```{r echo=TRUE}
+
+ezANOVA(data = prost_2022_plural
+              , dv = diff_score
+              , wid = SubjID
+              , within = .(Referentiality, Gender_Status, Anteriority)
+              , between = Group
+              , type = 3
+              , return_aov = F
+              )
+
+```
+
+#### Interaction Plots for Analysis 2  Gender Status by Referentiality Interaction 
+
+&nbsp;
+
+##### Binary Group
+
+&nbsp;
+
+```{r}
+summary_data <- filter(prost_2022_plural, Group == "Binary") |> 
+  group_by(Gender_Status, Referentiality) |>
+  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
+  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
+summary_data$label = c("Mary","some woman", "the participant", "someone")
+
+
+ggplot(summary_data, aes(x = Gender_Status, 
+                         y = mean,
+                         ymin = lwr,
+                         ymax = upr,
+                         fill = Referentiality, 
+                         group = Referentiality,
+                         label = label)) + 
+  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
+  geom_errorbar(width = .2, position = position_dodge(.9))  +
+  geom_label_repel(show.legend = FALSE, cex = 2)+
+  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+```
+
+&nbsp;
+
+```{r}
+summary_data <- filter(prost_2022_plural, Group == "Binary") |> 
+  group_by(Gender_Status, Referentiality) |>
+  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
+  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
+summary_data$label = c("Mary","some woman", "the participant", "someone")
+
+
+ggplot(summary_data, aes(x = Gender_Status, 
+                         y = mean,
+                         ymin = lwr,
+                         ymax = upr,
+                         colour = Referentiality, 
+                         linetype= Referentiality, 
+                         group = Referentiality,
+                         label = label)) + 
+  geom_point() + 
+  geom_line() +
+  geom_errorbar(width = .2, position = position_dodge(.025))  +
+  geom_label_repel(show.legend = FALSE, cex = 2)+
+  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+```
+
+
+##### NonBinary Group.  
+
+&nbsp;
+
+```{r}
+summary_data <- filter(prost_2022_plural, Group == "NonBinary") |> 
+  group_by(Gender_Status, Referentiality) |>
+  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
+  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
+summary_data$label = c("Mary","some woman", "the participant", "someone")
+
+
+ggplot(summary_data, aes(x = Gender_Status, 
+                         y = mean,
+                         ymin = lwr,
+                         ymax = upr,
+                         fill = Referentiality, 
+                         group = Referentiality,
+                         label = label)) + 
+  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
+  geom_errorbar(width = .2, position = position_dodge(.9))  +
+  geom_label_repel(show.legend = FALSE, cex = 2)+
+  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+```
+&nbsp;
+
+```{r}
+summary_data <- filter(prost_2022_plural, Group == "NonBinary") |> 
+  group_by(Gender_Status, Referentiality) |>
+  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
+  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
+summary_data$label = c("Mary","some woman", "the participant", "someone")
+
+
+ggplot(summary_data, aes(x = Gender_Status, 
+                         y = mean,
+                         ymin = lwr,
+                         ymax = upr,
+                         colour = Referentiality, 
+                         linetype= Referentiality, 
+                         group = Referentiality,
+                         label = label)) + 
+  geom_point() + 
+  geom_line() +
+  geom_errorbar(width = .2, position = position_dodge(.025)) +
+  geom_label_repel(show.legend = FALSE, cex = 2)+
+  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+```
+
+
+q

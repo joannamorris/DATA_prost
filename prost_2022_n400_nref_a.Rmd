@@ -1,0 +1,185 @@
+---
+title: 'The P600 for singular ''they'' v2:  N400 analyses for Nref (Fronto-Centro-Parietal) Electrode Sites'
+author: "Joanna Morris"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+fontsize: 10pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, fig.dim = c(4, 3))
+library(knitr)
+library(ggplot2)
+library(ggrepel)
+library(psych)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(pander)
+library(wesanderson)
+library(ez)
+
+```
+
+
+This document contains the code to format the data required to reproduce the statistical analyses described in [Prasad and Morris (2019)](https://psyarxiv.com/hwzke). You can download the data and the original .Rmd file [here](https://osf.io/2vjyp/).
+
+
+### Loading in and formatting the data
+
+(1) First we get the list of participants with more than 65% good data from Grusha's original datasets (2017)
+
+```{r}
+group2 <- read.table('group2_less_than_35_percent_data.txt', header = TRUE)
+group2$Group = "Binary"
+
+group3 <- read.table('group3and4_less_than_35_percent_data.txt', header = TRUE)
+group3$Group = "Non-binary"
+
+all_data = rbind(group2, group3)
+
+less_than_35_percent_subjs <- unique(all_data$ERPset)
+write.csv(less_than_35_percent_subjs
+          , "prost_subjlist_lessthan35.csv"
+          , row.names = FALSE)
+
+rm(all_data)
+rm(group2)
+rm(group3)
+
+```
+
+(1) Then we load in the data and label all the variables. 
+
+```{r}
+library(readr)
+library(stringr)
+prost_2022 <- read_csv('prost_mea_300500_202207.csv')
+
+
+centroparietal_channels  <- c('C3','Cz', 'C4', 'CP3', 'CPz', 'CP4', 'P3',  'Pz',  'P4')
+
+posterior_channels <- c('PZ','P4', 'P8', 'CP4', 'P7',  'P3',  'CP3', 'CPZ', 'TP7', 'TP8')
+
+nref_channels <- c('F3', 'Fz', 'F4', 'FC3', 'FCz', 'FC4', 'C3','Cz', 'C4', 'CP3', 'CPz', 'CP4', 'P3',  'Pz',  'P4')
+
+prost_2022 <- dplyr::filter(prost_2022, ERPset %in% less_than_35_percent_subjs)
+prost_2022 <- dplyr::filter(prost_2022, chlabel %in% nref_channels )
+
+
+prost_2022 <- dplyr::mutate(prost_2022,
+                            SubjID = str_extract(prost_2022$ERPset, "\\d{3}"))
+
+prost_2022 <- dplyr::mutate(prost_2022, 
+                            Referentiality = case_when(grepl("NonReferential"
+                                                             ,binlabel) ~ "NonReferential", 
+                                                       grepl("Referential"
+                                                             , binlabel) ~ "Referential"))
+
+prost_2022 <- dplyr::mutate(prost_2022, 
+                            Gender_Status = case_when(grepl("NonGendered"
+                                                            ,binlabel) ~ "NonGendered", 
+                                                       grepl("Gendered"
+                                                             , binlabel) ~ "Gendered"))
+
+prost_2022 <- dplyr::mutate(prost_2022, 
+                            Critical = case_when(grepl("Critical"
+                                                       ,binlabel) ~ "Critical",
+                                                 grepl("Baseline"
+                                                       , binlabel) ~ "Baseline"))
+
+prost_2022 <- dplyr::mutate(prost_2022, 
+                            Group = case_when(grepl("prost4"
+                                                    ,ERPset) ~ "NonBinary",
+                                              grepl("prost3"
+                                                    , ERPset) ~ "NonBinary",
+                                              grepl("prost2"
+                                                    , ERPset) ~ "Binary"))
+
+prost_2022 <-dplyr::mutate(prost_2022, 
+                            Number = case_when(grepl("himself_herself"
+                                                     ,binlabel) ~ "Singular",
+                                               grepl("themselves"
+                                                     , binlabel) ~ "Plural"))
+
+prost_2022 <- dplyr::mutate(prost_2022,
+                            Anteriority = case_when(grepl("F3|Fz|F4", 
+                                                          chlabel) ~ "Frontal",
+                                                    grepl("FC3|FCz|FC4",
+                                                          chlabel) ~ "FrontoCentral",
+                                                    grepl("C3|Cz|C4", 
+                                                           chlabel) ~ "Central",
+                                                    grepl("CP3|CPz|CP4", 
+                                                           chlabel) ~ "CentroParietal",
+                                                    grepl("P3|Pz|P4", 
+                                                           chlabel) ~ "Parietal",
+                                                    )
+                            )
+
+```
+
+
+(3) Then we collapse over the channels and gets difference scores
+
+```{r}
+# Collapse over all channels
+library(doBy)
+prost_2022_2<- 
+  summaryBy(value ~ SubjID + Referentiality + Gender_Status + Critical + Group + Anteriority + Number
+            , data=prost_2022)
+
+
+# get difference scores (Critical - Baseline)
+prost_2022_3 <- 
+  pivot_wider(prost_2022_2
+              , names_from = Critical
+              , values_from = value.mean)
+
+prost_2022_3 <- 
+  mutate(prost_2022_3
+         , diff_score = Critical - Baseline)
+```
+
+
+(4) Then we convert character vectors to factors
+
+```{r, results=FALSE}
+names <- c('Referentiality' ,'Gender_Status', 'Group', 'Anteriority', 'Number')
+prost_2022_3[,names] <- lapply(prost_2022_3[,names] , factor)
+str(prost_2022_3)
+```
+
+(5) Then we re-order factor levels for *Anteriority* & *Referentiality*
+
+```{r}
+prost_2022_3$Anteriority <- factor(prost_2022_3$Anteriority, 
+                                            levels=c('Frontal',
+                                                     'FrontoCentral', 
+                                                     'Central', 
+                                                     'CentroParietal', 
+                                                     'Parietal'))
+
+prost_2022_3$Referentiality <- factor(prost_2022_3$Referentiality, 
+                                            levels=c('Referential',
+                                                     'NonReferential'))
+levels(prost_2022_3$Anteriority)
+levels(prost_2022_3$Referentiality)
+```
+
+
+```{r}
+prost_2022_singular <- dplyr::filter(prost_2022_3, Number == "Singular")
+prost_2022_singular <- select( prost_2022_singular, -Number)
+write_csv(prost_2022_singular, "prost_2022_singular_n400_nref.csv")
+
+prost_2022_plural <- dplyr::filter(prost_2022_3, Number == "Plural")
+prost_2022_plural <- select( prost_2022_plural, -Number)
+write_csv(prost_2022_plural, "prost_2022_plural_n400_nref.csv")
+
+```
+
+

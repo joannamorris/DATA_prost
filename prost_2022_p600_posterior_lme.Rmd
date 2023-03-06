@@ -1,0 +1,375 @@
+---
+title: 'The P600 for singular ''they'': v2'
+author: "Joanna Morris"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+editor_options:
+  chunk_output_type: console
+fontsize: 10pt
+---
+
+
+
+
+
+
+
+### Overview
+
+This document contains the code to reproduce the statistical analyses described in [Prasad and Morris (2019)](https://psyarxiv.com/hwzke). You can download the data and the original .Rmd file [here](https://osf.io/2vjyp/). 
+
+This document has three sections:
+
+1. [Defining functions and loading in the data](#setup)
+2. [Analysis 1: The P600 effect when antecedents are co-indexed with *himself* or *herself*](#gender)
+3. [Analysis 2: The P600 effect when antecedents are co-indexed with *themselves*](#number)
+
+### Loading in and formatting the data 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FALSE, fig.dim = c(4, 3))
+library(knitr)
+library(ggplot2)
+library(psych)
+library(lme4)
+library(tidyr)library(dplyr)
+
+```
+
+Before we begin, let's set some general parameters for `ggplot2`. We will set a general theme using the `theme_set()` function.  We will use the 'classic' theme which gives us clean white background rather than the default grey with white grid lines.  And we will position the legend at the top of the graph rather than at the right side which is the default.
+
+```{r theme}
+theme_set(theme_classic() +  theme(legend.position = "top")) 
+```
+
+This chunks gets the list of participants with more than 65% good data from Grusha's original datasets (2017)
+
+
+```{r}
+library(tidyr)
+group2 <- read.table('group2_less_than_35_percent_data.txt', header = TRUE)
+group2$group = "Binary"
+
+group3 <- read.table('group3and4_less_than_35_percent_data.txt', header = TRUE)
+group3$group = "Non-binary"
+
+all_data = rbind(group2, group3)
+
+less_than_35_percent_subjs <- unique(all_data$ERPset)
+write.csv(less_than_35_percent_subjs
+          , "prost_subjlist_lessthan35.csv"
+          , row.names = FALSE)
+
+rm(all_data)
+rm(group2)
+rm(group3)
+
+```
+
+
+This chunk loads in and formats the data
+
+```{r}
+library(readr)
+library(stringr)
+prost_2022 <- read_csv('prost_mea_500800_202207.csv')
+
+
+posterior_channels <- c('PZ','P4', 'P8', 'CP4', 'P7', 'P3', 'CP3', 'CPZ', 'TP7', 'TP8')
+
+prost_2022 <- dplyr::filter(prost_2022, ERPset %in% less_than_35_percent_subjs)
+prost_2022 <- dplyr::filter(prost_2022, chlabel %in% posterior_channels)
+
+
+prost_2022 <- dplyr::mutate(prost_2022,
+                            subjID = str_extract(prost_2022$ERPset, "\\d{3}"))
+
+prost_2022 <- dplyr::mutate(prost_2022, 
+                            referentiality = case_when(grepl("NonReferential"
+                                                             ,binlabel) ~ "NonReferential", 
+                                                       grepl("Referential"
+                                                             , binlabel) ~ "Referential"))
+
+prost_2022 <- dplyr::mutate(prost_2022, 
+                            gender_status = case_when(grepl("NonGendered"
+                                                            ,binlabel) ~ "NonGendered", 
+                                                       grepl("Gendered"
+                                                             , binlabel) ~ "Gendered"))
+
+prost_2022 <- dplyr::mutate(prost_2022, 
+                            critical = case_when(grepl("Critical"
+                                                       ,binlabel) ~ "Critical",
+                                                 grepl("Baseline"
+                                                       , binlabel) ~ "Baseline"))
+
+prost_2022 <- dplyr::mutate(prost_2022, 
+                            group = case_when(grepl("prost4"
+                                                    ,ERPset) ~ "NonBinary",
+                                              grepl("prost3"
+                                                    , ERPset) ~ "NonBinary",
+                                              grepl("prost2"
+                                                    , ERPset) ~ "Binary"))
+
+prost_2022 <-dplyr::mutate(prost_2022, 
+                            number = case_when(grepl("himself_herself"
+                                                     ,binlabel) ~ "Singular",
+                                               grepl("themselves"
+                                                     , binlabel) ~ "Plural"))
+
+
+prost_2022_singular <- dplyr::filter(prost_2022, number == "Singular")
+prost_2022_plural <- dplyr::filter(prost_2022, number == "Plural")
+
+# Collapse over all channels
+library(doBy)
+prost_2022_singular_2<- 
+  summaryBy(value ~ subjID + referentiality + gender_status + critical + group 
+            , data=prost_2022_singular)
+
+prost_2022_plural_2<- 
+  summaryBy(value ~ subjID + referentiality + gender_status + critical + group 
+            , data=prost_2022_plural)
+
+# get difference scores (Critical - Baseline)
+prost_2022_singular_3 <- 
+  pivot_wider(prost_2022_singular_2
+              , names_from = critical
+              , values_from = value.mean)
+
+prost_2022_singular_3 <- 
+  mutate(prost_2022_singular_3
+         , diff_score = Critical - Baseline)
+
+prost_2022_plural_3 <- pivot_wider(prost_2022_plural_2
+                                   , names_from = critical
+                                   , values_from = value.mean)
+
+prost_2022_plural_3 <- mutate(prost_2022_plural_3
+                              , diff_score = Critical - Baseline)
+```
+
+
+
+### Analysis 1: The P600 effect when antecedents are co-indexed with *himself* or *herself* 
+
+#### Condition Means for Analysis 1: The P600 effect when antecedents are co-indexed with *himself* or *herself* 
+
+```{r}
+
+stats.sing.means.ref <- describeBy(prost_2022_singular_3$diff_score
+                               ,prost_2022_singular_3$referentiality
+                              , mat=TRUE,digits=2)
+(stats.sing.means.ref <- rename(stats.sing.means.ref
+                         , referentiality =group1))
+
+stats.sing.means.gender <- describeBy(prost_2022_singular_3$diff_score
+                               ,prost_2022_singular_3$gender_status
+                              , mat=TRUE,digits=2)
+(stats.sing.means.gender <- rename(stats.sing.means.gender
+                         , gender_status =group1))
+
+stats.sing.means.ref_gender <-  describeBy(prost_2022_singular_3$diff_score
+                              ,list(prost_2022_singular_3$referentiality
+                                    ,prost_2022_singular_3$gender_status)
+                              , mat=TRUE,digits=2)
+(stats.sing.means.ref_gender <- rename(stats.sing.means.ref_gender
+                         , referentiality =group1
+                         , gender_status = group2))
+
+```
+
+
+
+#### Plotting the Data
+
+```{r}
+library(ggplot2)
+
+ggplot(prost_2022_singular_3,aes(x=gender_status,y=diff_score,col=referentiality)) + geom_jitter(width = .25, alpha = .7) + geom_boxplot(alpha=0.2) + facet_wrap(~group)
+```
+
+
+#### LME Analysis Singular
+
+##### Null Model
+
+This  model  contains fixed intercepts for *referentiality* and *gender_status* as well as  random intercepts for subjects (adjustments to the mean for each subject).  After running this chunk, we get a singular fit, suggesting There is not enough additional subject-level variation to warrant adding an additional subject-level random effect to explain all the observed variation. See discussion [here](https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#singular-models-random-effect-variances-estimated-as-zero-or-correlations-estimated-as---1)
+
+```{r afxfrq_inv_null.model, comment=NA}
+
+null.model = lmer(data= prost_2022_singular_3,
+                  diff_score ~ 1 + (1|subjID), 
+                  REML=FALSE)
+summary(null.model)
+```
+
+
+##### Main Effects Models
+
+This  model  contains fixed intercepts for *referentiality* and *gender_status* as well as  random intercepts for subjects (adjustments to the mean for each subject and item)
+
+```{r afxfrq_inv_main.model, comment=NA}
+
+main.model = lmer(diff_score ~ 1 + referentiality + gender_status + group + (1|subjID),
+                  data= prost_2022_singular_3, 
+                  REML=FALSE)
+summary(main.model)
+```
+
+##### Interaction Model
+```{r afx_frq_inv_inter.model, comment=NA}
+
+inter.model = lmer(diff_score ~ referentiality * gender_status * group + (1|subjID),
+                   data= prost_2022_singular_3,
+                   REML=FALSE)
+summary(inter.model)
+
+```
+
+##### Compare Null and Main Models: Affix Frequency
+
+```{r  null_main_afx_frq}
+anova(null.model,main.model)
+```
+
+##### Compare Main and Interaction Models: Affix Frequency
+
+```{r  main_full_afx_frq}
+anova(main.model,inter.model)
+```
+
+
+
+#### Traditional ANOVA Singular
+
+```{r}
+library(ez)
+(aov.model <- ezANOVA(data = prost_2022_singular_3
+              , dv = diff_score
+              , wid = subjID
+              , within = .(referentiality, gender_status)
+              , between = group
+              , type = 3
+              , return_aov = FALSE
+              ))
+
+```
+
+
+### Analysis 2: The P600 effect when antecedents are co-indexed with *themselves* 
+#### LEM Analysis Pural
+
+##### Null Model
+
+```{r}
+
+```
+
+
+##### Main Effects Models
+
+```{r}
+
+```
+
+
+##### Interaction Model
+
+```{r}
+
+```
+
+
+##### Compare Null and Main Models: Affix Frequency
+
+```{r  null_main_afx_frq}
+anova(null.model,main.model)
+```
+
+##### Compare Main and Interaction Models: Affix Frequency
+
+```{r  main_full_afx_frq}
+anova(main.model,inter.model)
+```
+
+#### Traditional ANOVA Singular
+```{r}
+m2 <- ezANOVA(data = prost_2022_plural_3
+              , dv = diff_score
+              , wid = subjID
+              , within = .(referentiality, gender_status)
+              , between = group
+              , type = 3
+              , return_aov = F
+              )
+m2
+```
+
+##### Condition Means for Analysis 2: The P600 effect when antecedents are co-indexed with *themselves* 
+
+```{r}
+
+stats_plural_1a <- describeBy(prost_2022_plural_3$diff_score
+                               ,prost_2022_plural_3$referentiality
+                              , mat=TRUE,digits=2)
+stats_plural_1a <- rename(stats_plural_1a
+                         , referentiality =group1)
+
+stats_plural_1b <- describeBy(prost_2022_plural_3$diff_score
+                               ,prost_2022_plural_3$gender_status
+                              , mat=TRUE,digits=2)
+stats_plural_1b <- rename(stats_plural_1b
+                         , gender_status =group1)
+
+stats_plural_2 <-  describeBy(prost_2022_plural_3$diff_score
+                              ,list(prost_2022_plural_3$referentiality
+                                    ,prost_2022_plural_3$gender_status)
+                              , mat=TRUE,digits=2)
+stats_plural_2 <- rename(stats_plural_2
+                         , referentiality =group1
+                         , gender_status = group2)
+
+stats_plural_1a
+stats_plural_1b
+stats_plural_2
+```
+
+
+##### Post-hoc tests for Analysis 2: The P600 effect when antecedents are co-indexed with *themselves* 
+
+```{r}
+# "Some woman...themselves" vs. "Mary...themselves"
+t.test(diff_score ~ referentiality
+       , filter(prost_2022_plural_3, gender_status == "Gendered")
+       , paired=TRUE)
+
+# "Someone...themselves" vs. "The participant...themselves"
+t.test(diff_score ~ referentiality
+       , filter(prost_2022_plural_3, gender_status == "NonGendered")
+       , paired=TRUE)
+
+# "The participant...themselves" vs. "Mary...themselves"
+t.test(diff_score ~ gender_status
+       , filter(prost_2022_plural_3, referentiality == "Referential")
+       , paired=TRUE)
+
+# Someone...themselves" vs. "Some woman...themselves"
+t.test(diff_score ~ gender_status
+       , filter(prost_2022_plural_3, referentiality == "NonReferential")
+       , paired=TRUE)
+```
+
+
+
+##### Interaction Plots for Analysis 2: The P600 effect when antecedents are co-indexed with *themselves* 
+
+```{r}
+# themselves
+doBy::interaction_plot(prost_2022_plural_3, diff_score ~ referentiality + gender_status )
+doBy::interaction_plot(prost_2022_plural_3
+                       , diff_score ~ gender_status + referentiality )
+```
+
+
