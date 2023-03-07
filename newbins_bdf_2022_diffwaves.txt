@@ -1,0 +1,4 @@
+b81 = b66 - b65 label = NonReferential NonGendered Singular Difference Wave
+b82 = b68 - b67 label = NonReferential Gendered Singular Difference Wave   
+b83 = b70 - b69 label = Referential NonGendered Singular Difference Wave   
+b84 = b72 - b71 label = Referential Gendered Singular Difference Wave      
