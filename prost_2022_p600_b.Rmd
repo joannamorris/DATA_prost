@@ -20,9 +20,7 @@ library(readr)
 library(dplyr)
 library(tidyr)
 library(pander)
-library(RColorBrewer)
 library(ggsci)
-
 library(ez)
 
 ```
@@ -177,7 +175,8 @@ ggplot(summary_data_1, aes(x = Referentiality,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2) +
-  scale_fill_npg() + ylab("Voltage in microvolts") 
+  scale_fill_npg() + ylab("Voltage in microvolts")  +
+  ggtitle("Gender Status by Referentiality Interaction")
   # scale_fill_brewer(palette = "Pastel1")
   # scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
@@ -208,9 +207,10 @@ plot1<- ggplot(summary_data_1b, aes(x = Referentiality,
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2)  +
   scale_fill_npg() + ylab("Voltage in microvolts") +
+  ggtitle("Gender Status by Referentiality Interaction: Binary") 
   # scale_fill_brewer(palette = "Pastel1")
   # scale_fill_manual(values=c("cadetblue", "lightpink1"))+
-  ggtitle("Binary") 
+ 
 
 plot2 <- ggplot(summary_data_1nb, aes(x = Referentiality, 
                          y = mean,
@@ -223,7 +223,7 @@ plot2 <- ggplot(summary_data_1nb, aes(x = Referentiality,
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2) +
   scale_fill_npg() + ylab("Voltage in microvolts") +
-  ggtitle("NonBinary")
+  ggtitle("Gender Status by Referentiality Interaction: NonBinary")
    # scale_fill_brewer(palette = "Pastel1")
   # scale_fill_manual(values=c("cadetblue", "lightpink1"))+
 
@@ -246,8 +246,8 @@ ggplot(summary_data_1, aes(x = Referentiality,
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_npg() + ylab("Voltage in microvolts")
-  # scale_fill_brewer(palette = "Pastel1")
+  scale_colour_npg() + ylab("Voltage in microvolts")
+  #scale_fill_brewer(palette = "Pastel1")
   #scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 
@@ -366,7 +366,8 @@ ggplot(summary_data_2, aes(x = Referentiality,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_npg() + ylab("Voltage in microvolts")
+  scale_fill_npg() + ylab("Voltage in microvolts") +
+  ggtitle("Gender Status by Referentiality Interaction*")
   # scale_fill_brewer(palette = "Pastel1")
   # scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
@@ -439,7 +440,7 @@ ggplot(summary_data_2, aes(x = Referentiality,
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025))  +
   geom_label_repel(show.legend = FALSE,cex = 2)+
-  scale_fill_npg() + ylab("Voltage in microvolts")
+  scale_colour_npg() + ylab("Voltage in microvolts")
   # scale_fill_brewer(palette = "Pastel1")
   # scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```

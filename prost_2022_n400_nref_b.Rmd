@@ -29,8 +29,8 @@ library(readr)
 library(dplyr)
 library(tidyr)
 library(pander)
-library(wesanderson)
 library(ez)
+library(ggsci)
 
 ```
 
@@ -47,7 +47,7 @@ sem <- function(x) sd(x)/sqrt(length(x))
 Before we begin, let's set some general parameters for `ggplot2`. We will set a general theme using the `theme_set()` function. We will use the 'classic' theme which gives us clean white background rather than the default grey with white grid lines. And we will position the legend at the top of the graph rather than at the right side which is the default.
 
 ```{r theme}
-theme_set(theme_classic() +  theme(legend.position = "top")) 
+theme_set(theme_classic() +  theme(legend.position = "bottom")) 
 ```
 
 
@@ -195,7 +195,7 @@ pander(t.test(diff_score ~ Gender_Status, somewoman_theparticipant, paired=TRUE)
 ```
 
 
-##### Interaction Plots: Group x Gender Status x Referentiality Binary
+##### Interaction Plots: Group x Gender Status x Referentiality Interaction: Binary
 &nbsp;
 
 ```{r}
@@ -216,7 +216,9 @@ ggplot(summary_data_1b, aes(x = Referentiality,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2) +
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts") +
+  ggtitle("Gender Status x Referentiality Interaction: Binary")
+  #scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 
 &nbsp;
@@ -235,7 +237,8 @@ ggplot(summary_data_1b, aes(x = Referentiality,
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts")
+  #scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 
 
@@ -320,7 +323,9 @@ ggplot(summary_data_1nb, aes(x = Referentiality,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts") +
+  ggtitle("Gender Status x Referentiality Interaction: Non Binary")
+  #scale_fill_manual(values=c("cadetblue", "lightpink1"))
 
 ```
 
@@ -340,7 +345,8 @@ ggplot(summary_data_1nb, aes(x = Gender_Status,
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025)) +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_color_manual(values=wes_palette(n=3, name="Royal1"))
+  scale_fill_npg() + ylab("Voltage in microvolts") +
+  #scale_color_manual(values=wes_palette(n=3, name="Royal1"))
 ```
 
 
@@ -402,7 +408,9 @@ ggplot(summary_data_3, aes(x = Anteriority,
   geom_point() + 
   geom_line() +
   geom_errorbar(width = .3, position = position_dodge(.1)) +
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_colour_npg() + ylab("Voltage in microvolts") +
+  ggtitle("Group by Anteriority Interaction")
+ # scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 
 
@@ -457,7 +465,9 @@ ggplot(summary_data, aes(x = Gender_Status,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts") +
+  ggtitle("Gender Status x Referentiality Interaction: Binary")
+ # scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 
 &nbsp;
@@ -482,7 +492,8 @@ ggplot(summary_data, aes(x = Gender_Status,
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts") 
+# scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 
 
@@ -508,7 +519,9 @@ ggplot(summary_data, aes(x = Gender_Status,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts")+
+  ggtitle("Gender Status x Referentiality Interaction: NonBinary")
+  #scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 &nbsp;
 
@@ -532,8 +545,7 @@ ggplot(summary_data, aes(x = Gender_Status,
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025)) +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts")
+  #scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 
-
-q
