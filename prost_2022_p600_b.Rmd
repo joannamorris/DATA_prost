@@ -21,6 +21,7 @@ library(dplyr)
 library(tidyr)
 library(pander)
 library(RColorBrewer)
+library(ggsci)
 
 library(ez)
 
@@ -39,7 +40,7 @@ sem <- function(x) sd(x)/sqrt(length(x))
 Before we begin, let's set some general parameters for `ggplot2`. We will set a general theme using the `theme_set()` function. We will use the 'classic' theme which gives us clean white background rather than the default grey with white grid lines. And we will position the legend at the top of the graph rather than at the right side which is the default.
 
 ```{r theme}
-theme_set(theme_classic() +  theme(legend.position = "top")) 
+theme_set(theme_classic() +  theme(legend.position = "bottom")) 
 ```
 
 
@@ -176,7 +177,9 @@ ggplot(summary_data_1, aes(x = Referentiality,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2) +
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts") 
+  # scale_fill_brewer(palette = "Pastel1")
+  # scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 
 Interaction broken down by Group *Binary* vs *Non-Binary*
@@ -204,8 +207,10 @@ plot1<- ggplot(summary_data_1b, aes(x = Referentiality,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2)  +
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))+
-  ggtitle("Binary")
+  scale_fill_npg() + ylab("Voltage in microvolts") +
+  # scale_fill_brewer(palette = "Pastel1")
+  # scale_fill_manual(values=c("cadetblue", "lightpink1"))+
+  ggtitle("Binary") 
 
 plot2 <- ggplot(summary_data_1nb, aes(x = Referentiality, 
                          y = mean,
@@ -217,8 +222,10 @@ plot2 <- ggplot(summary_data_1nb, aes(x = Referentiality,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2) +
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))+
+  scale_fill_npg() + ylab("Voltage in microvolts") +
   ggtitle("NonBinary")
+   # scale_fill_brewer(palette = "Pastel1")
+  # scale_fill_manual(values=c("cadetblue", "lightpink1"))+
 
 library(gridExtra)
 grid.arrange(plot1, plot2, ncol=2)
@@ -239,7 +246,9 @@ ggplot(summary_data_1, aes(x = Referentiality,
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts")
+  # scale_fill_brewer(palette = "Pastel1")
+  #scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 
 
@@ -357,7 +366,9 @@ ggplot(summary_data_2, aes(x = Referentiality,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts")
+  # scale_fill_brewer(palette = "Pastel1")
+  # scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 
 
@@ -387,8 +398,10 @@ plot1<- ggplot(summary_data_2b, aes(x = Referentiality,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2)  +
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))+
-  ggtitle("Binary")
+  scale_fill_npg() + ggtitle("Binary") + ylab("Voltage in microvolts")
+  # scale_fill_brewer(palette = "Pastel1")
+  # scale_fill_manual(values=c("cadetblue", "lightpink1"))+
+  
 
 plot2 <- ggplot(summary_data_2nb, aes(x = Referentiality, 
                          y = mean,
@@ -400,8 +413,10 @@ plot2 <- ggplot(summary_data_2nb, aes(x = Referentiality,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2) +
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))+
-  ggtitle("NonBinary")
+  scale_fill_npg() + ggtitle("NonBinary") + ylab("Voltage in microvolts")
+  # scale_fill_brewer(palette = "Pastel1")
+  # scale_fill_manual(values=c("cadetblue", "lightpink1"))+
+  
 
 library(gridExtra)
 grid.arrange(plot1, plot2, ncol=2)
@@ -424,7 +439,9 @@ ggplot(summary_data_2, aes(x = Referentiality,
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025))  +
   geom_label_repel(show.legend = FALSE,cex = 2)+
-  scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts")
+  # scale_fill_brewer(palette = "Pastel1")
+  # scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 
 
