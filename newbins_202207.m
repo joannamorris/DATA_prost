@@ -16,8 +16,8 @@ ALLERP     = buildERPstruct([]);
 %% This defines the set of subjects and Path to the parent folder, which contains the data folders for all subjects
 subject_list = importdata('subjlist_202207.txt', '\n');
 nsubj        = length(subject_list); % number of subjects
-home_path  = '/Volumes/GoogleDrive/My Drive/PROVIDENCE COLLEGE/MANUSCRIPTS/PROST/DATA/ERP files with added bins/';
-
+%home_path  = '/Volumes/GoogleDrive/My Drive/PROVIDENCE COLLEGE/MANUSCRIPTS/PROST/DATA/ERP files with added bins/';
+home_path = '/Users/jmorris/Library/CloudStorage/GoogleDrive-jamCCS@hampshire.edu/My Drive/PROVIDENCE COLLEGE/MANUSCRIPTS/PROST/DATA/ERP files with added bins/erp_2022/';
 
  %% Loop through all subjects
     for s=1:nsubj

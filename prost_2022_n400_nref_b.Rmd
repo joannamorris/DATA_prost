@@ -345,7 +345,7 @@ ggplot(summary_data_1nb, aes(x = Gender_Status,
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025)) +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_npg() + ylab("Voltage in microvolts") +
+  scale_fill_npg() + ylab("Voltage in microvolts")
   #scale_color_manual(values=wes_palette(n=3, name="Royal1"))
 ```
 
