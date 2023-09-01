@@ -1,3 +1,4 @@
+
 ---
 title: "The P600 effect when singular gendered antecedents are co-indexed with (a) *himself* or *herself* (b) *themselves*"
 author: "Joanna Morris"
@@ -7,7 +8,8 @@ editor_options:
   chunk_output_type: console
 ---
 
-This script conducts an ANOVA examining the P600 PROST data with Referentiality and Gender as within variables and Identity Status as a between factor. Analysis 1 examines the data for antecedents are co-indexed with *himself* or *herself*, while Analysis 2 examines the  P600 effect when antecedents are co-indexed with *themselves*
+This script, on the advice of reviewer 1, conducts an ANOVA examining the P600 PROST data with Referentiality and Gender as within variables. Gender Identity status will be examined as a post-hoc variable. Analysis 1 examines the data for antecedents that are co-indexed with *himself* or *herself*, while Analysis 2 examines the  P600 effect when antecedents are co-indexed with *themselves*
+
 
 
 ```{r setup, include=FALSE}
@@ -22,7 +24,7 @@ library(tidyr)
 library(pander)
 library(ggsci)
 library(ez)
-
+library(gridExtra)
 ```
 
 
@@ -69,7 +71,6 @@ ezANOVA(data = prost_2022_singular
               , dv = diff_score
               , wid = SubjID
               , within = .(Referentiality, Gender_Status)
-              , between = Group
               , type = 3
               , return_aov = F
               )
@@ -79,7 +80,7 @@ ezANOVA(data = prost_2022_singular
 
 The P600 effect when antecedents are co-indexed with *himself* or *herself*.  
 
-Significant Effects: **Referentiality; Group x Referentiality x Gender Status**
+Significant Effects: **Referentiality; Referentiality x Gender Status**
 
 ```{r}
 
@@ -99,16 +100,9 @@ kable(singular_means1 <- prost_2022_singular |>
             Max = max(diff_score), 
             Min = min(diff_score)), digits = 2)
 
-kable(singular_means2 <- prost_2022_singular |> 
-  group_by( Group) |>
-  summarise(Mean = mean(diff_score), 
-            SE = sem(diff_score), 
-            SD = sd(diff_score), 
-            Max = max(diff_score), 
-            Min = min(diff_score)), digits = 2)
 
 kable(singular_means2 <- prost_2022_singular |> 
-  group_by(Referentiality, Gender_Status,Group) |>
+  group_by(Referentiality, Gender_Status) |>
   summarise(Mean = mean(diff_score), 
             SE = sem(diff_score), 
             SD = sd(diff_score), 
@@ -119,7 +113,7 @@ kable(singular_means2 <- prost_2022_singular |>
 
 ### Post-hoc tests for Analysis 1: Gender Status x Referentiality
 
-The following chunk runs post-hoc tests for the 3-way ***"Group x Gender Status x Referentiality"*** Interaction
+The following chunk runs post-hoc tests for the 32-way ***"Gender Status x Referentiality"*** Interaction
 
 
 "Some woman...himself" vs. "Mary...himself"  
@@ -165,7 +159,7 @@ summary_data_1 <- prost_2022_singular |>
 summary_data_1$label = c("Mary","some woman","the participant", "someone" )
 
 
-ggplot(summary_data_1, aes(x = Referentiality, 
+plot1 <- ggplot(summary_data_1, aes(x = Referentiality, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
@@ -179,62 +173,30 @@ ggplot(summary_data_1, aes(x = Referentiality,
   ggtitle("Gender Status by Referentiality Interaction")
   # scale_fill_brewer(palette = "Pastel1")
   # scale_fill_manual(values=c("cadetblue", "lightpink1"))
-```
 
-Interaction broken down by Group *Binary* vs *Non-Binary*
-
-```{r, fig.dim = c(8, 3)}
-summary_data_1b <- filter(prost_2022_singular, Group == "Binary") |> 
-  group_by(Gender_Status, Referentiality) |>
-  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
-  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
-summary_data_1b$label = c("Mary","some woman","the participant", "someone")
-
-summary_data_1nb <- filter(prost_2022_singular, Group == "NonBinary") |> 
-  group_by(Gender_Status, Referentiality) |>
-  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
-  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
-summary_data_1nb$label = c("Mary","some woman","the participant", "someone")
-
-plot1<- ggplot(summary_data_1b, aes(x = Referentiality, 
+plot2 <- ggplot(summary_data_1, aes(x = Gender_Status, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
-                         fill = Gender_Status, 
-                         group = Gender_Status,
-                         label = label)) + 
-  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
-  geom_errorbar(width = .2, position = position_dodge(.9))  +
-  geom_label_repel(show.legend = FALSE, cex = 2)  +
-  scale_fill_npg() + ylab("Voltage in microvolts") +
-  ggtitle("Gender Status by Referentiality Interaction: Binary") 
-  # scale_fill_brewer(palette = "Pastel1")
-  # scale_fill_manual(values=c("cadetblue", "lightpink1"))+
- 
-
-plot2 <- ggplot(summary_data_1nb, aes(x = Referentiality, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         fill = Gender_Status, 
-                         group = Gender_Status,
+                         fill = Referentiality, 
+                         group = Referentiality,
                          label = label)) + 
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2) +
-  scale_fill_npg() + ylab("Voltage in microvolts") +
-  ggtitle("Gender Status by Referentiality Interaction: NonBinary")
-   # scale_fill_brewer(palette = "Pastel1")
-  # scale_fill_manual(values=c("cadetblue", "lightpink1"))+
+  scale_fill_npg() + ylab("Voltage in microvolts")  +
+  ggtitle("Gender Status by Referentiality Interaction")
+  # scale_fill_brewer(palette = "Pastel1")
+  # scale_fill_manual(values=c("cadetblue", "lightpink1"))
 
-library(gridExtra)
 grid.arrange(plot1, plot2, ncol=2)
 ```
 
+&nbsp;
 
 ```{r}
 
-ggplot(summary_data_1, aes(x = Referentiality, 
+plot1 <- ggplot(summary_data_1, aes(x = Referentiality, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
@@ -249,6 +211,24 @@ ggplot(summary_data_1, aes(x = Referentiality,
   scale_colour_npg() + ylab("Voltage in microvolts")
   #scale_fill_brewer(palette = "Pastel1")
   #scale_fill_manual(values=c("cadetblue", "lightpink1"))
+
+plot2 <- ggplot(summary_data_1, aes(x = Gender_Status, 
+                         y = mean,
+                         ymin = lwr,
+                         ymax = upr,
+                         colour = Referentiality, 
+                         linetype= Referentiality, 
+                         group = Referentiality,
+                         label = label)) + 
+  geom_point() + 
+  geom_line() +
+  geom_errorbar(width = .2, position = position_dodge(.025))  +
+  geom_label_repel(show.legend = FALSE, cex = 2)+
+  scale_colour_npg() + ylab("Voltage in microvolts")
+  #scale_fill_brewer(palette = "Pastel1")
+  #scale_fill_manual(values=c("cadetblue", "lightpink1"))
+
+grid.arrange(plot1, plot2, ncol=2)
 ```
 
 
@@ -263,12 +243,13 @@ ezANOVA(data = prost_2022_plural
               , dv = diff_score
               , wid = SubjID
               , within = .(Referentiality, Gender_Status)
-              , between = Group
               , type = 3
               , return_aov = F
               )
 
 ```
+
+&nbsp;  
 
 ### Condition Means for Analysis 2
 
@@ -296,7 +277,7 @@ kable(plural_means1 <- prost_2022_plural |>
 
 
 kable(plural_means2 <- prost_2022_plural |> 
-  group_by(Referentiality, Gender_Status,Group) |>
+  group_by(Referentiality, Gender_Status) |>
   summarise(Mean = mean(diff_score), 
             SE = sem(diff_score), 
             SD = sd(diff_score), 
@@ -304,6 +285,8 @@ kable(plural_means2 <- prost_2022_plural |>
             Min = min(diff_score)), digits = 2)
 
 ```
+
+&nbsp;  
 
 ### Post-hoc tests for Analysis 2: Gender Status x Referentiality
 
@@ -356,7 +339,7 @@ summary_data_2 <- prost_2022_plural |>
 summary_data_2$label = c("Mary","some woman", "the participant", "someone")
 
 
-ggplot(summary_data_2, aes(x = Referentiality, 
+plot1<- ggplot(summary_data_2, aes(x = Referentiality, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
@@ -370,67 +353,30 @@ ggplot(summary_data_2, aes(x = Referentiality,
   ggtitle("Gender Status by Referentiality Interaction")
   # scale_fill_brewer(palette = "Pastel1")
   # scale_fill_manual(values=c("cadetblue", "lightpink1"))
-```
 
-
-
-Interaction broken down by Group *Binary* vs *Non-Binary*
-
-```{r, fig.dim = c(8, 3)}
-summary_data_2b <- filter(prost_2022_plural, Group == "Binary") |> 
-  group_by(Gender_Status, Referentiality) |>
-  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
-  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
-summary_data_2b$label = c("Mary","some woman", "the participant", "someone")
-
-summary_data_2nb <- filter(prost_2022_plural, Group == "NonBinary") |> 
-  group_by(Gender_Status, Referentiality) |>
-  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
-  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
-summary_data_2nb$label = c("Mary","some woman", "the participant", "someone")
-
-plot1<- ggplot(summary_data_2b, aes(x = Referentiality, 
+plot2 <- ggplot(summary_data_2, aes(x = Gender_Status, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
-                         fill = Gender_Status, 
-                         group = Gender_Status,
+                         fill = Referentiality, 
+                         group = Referentiality,
                          label = label)) + 
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
-  geom_label_repel(show.legend = FALSE, cex = 2)  +
-  scale_fill_npg()  + ylab("Voltage in microvolts")+
-  ggtitle("Gender Status by Referentiality Interaction: Binary")
-  # scale_fill_brewer(palette = "Pastel1")
-  # scale_fill_manual(values=c("cadetblue", "lightpink1"))+
-  
-
-plot2 <- ggplot(summary_data_2nb, aes(x = Referentiality, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         fill = Gender_Status, 
-                         group = Gender_Status,
-                         label = label)) + 
-  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
-  geom_errorbar(width = .2, position = position_dodge(.9))  +
-  geom_label_repel(show.legend = FALSE, cex = 2) +
+  geom_label_repel(show.legend = FALSE, cex = 2)+
   scale_fill_npg() + ylab("Voltage in microvolts") +
-  ggtitle("Gender Status by Referentiality Interaction: NonBinary")
+  ggtitle("Gender Status by Referentiality Interaction")
   # scale_fill_brewer(palette = "Pastel1")
-  # scale_fill_manual(values=c("cadetblue", "lightpink1"))+
-  
+  # scale_fill_manual(values=c("cadetblue", "lightpink1"))
 
-library(gridExtra)
 grid.arrange(plot1, plot2, ncol=2)
 ```
+
 
 &nbsp;
 
 ```{r}
-
-
-ggplot(summary_data_2, aes(x = Referentiality, 
+plot1 <- ggplot(summary_data_2, aes(x = Referentiality, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
@@ -445,6 +391,24 @@ ggplot(summary_data_2, aes(x = Referentiality,
   scale_colour_npg() + ylab("Voltage in microvolts")
   # scale_fill_brewer(palette = "Pastel1")
   # scale_fill_manual(values=c("cadetblue", "lightpink1"))
+
+plot2 <- ggplot(summary_data_2, aes(x = Gender_Status, 
+                         y = mean,
+                         ymin = lwr,
+                         ymax = upr,
+                         colour = Referentiality, 
+                         linetype= Referentiality, 
+                         group = Referentiality,
+                         label = label)) + 
+  geom_point() + 
+  geom_line() +
+  geom_errorbar(width = .2, position = position_dodge(.025))  +
+  geom_label_repel(show.legend = FALSE,cex = 2)+
+  scale_colour_npg() + ylab("Voltage in microvolts")
+  # scale_fill_brewer(palette = "Pastel1")
+  # scale_fill_manual(values=c("cadetblue", "lightpink1"))
+
+grid.arrange(plot1, plot2, ncol=2)
 ```
 
 

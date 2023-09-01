@@ -27,7 +27,7 @@ library(ez)
 ```
 
 
-This document contains the code to format the data required to reproduce the statistical analyses described in [Prasad and Morris (2019)](https://psyarxiv.com/hwzke). You can download the data and the original .Rmd file [here](https://osf.io/2vjyp/).
+This document contains the code to format the data required to conduct the statistical analyses for PROST project. It takes participants with more than 65% good data from Grusha's original datasets (2017), label all the variables, collapses over all the channels  and then creates a difference wave. The output files  are "prost_2022_singular_p600.csv" and "prost_2022_plural_p600.csv" 
 
 
 ### Loading in and formatting the data
