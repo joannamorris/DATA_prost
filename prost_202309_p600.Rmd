@@ -13,7 +13,7 @@ This script, on the advice of reviewer 1, conducts an ANOVA examining the P600 P
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, fig.dim = c(4, 3))
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, fig.dim = c(6, 6))
 library(knitr)
 library(ggplot2)
 library(ggrepel)
@@ -37,10 +37,11 @@ Define standard error of mean function
 sem <- function(x) sd(x)/sqrt(length(x))
 ```
 
-Before we begin, let's set some general parameters for `ggplot2`. We will set a general theme using the `theme_set()` function. We will use the 'classic' theme which gives us clean white background rather than the default grey with white grid lines. And we will position the legend at the top of the graph rather than at the right side which is the default.
+Before we begin, let's set some general parameters for `ggplot2`. We will set a general theme using the `theme_set()` function. We will use the 'classic' theme which gives us clean white background rather than the default grey with white grid lines. We will position the legend at the top of the graph rather than at the right side which is the default.
 
 ```{r theme}
-theme_set(theme_classic() +  theme(legend.position = "bottom")) 
+theme_set(theme_classic()+
+            theme(legend.position = "bottom")) 
 ```
 
 
@@ -169,10 +170,10 @@ plot1 <- ggplot(summary_data_1, aes(x = Referentiality,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2) +
-  scale_fill_npg() + ylab("Voltage in microvolts")  +
-  ggtitle("Gender Status by Referentiality Interaction")
-  # scale_fill_brewer(palette = "Pastel1")
-  # scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts") +
+  theme(legend.text = element_text(size=10))+ 
+  theme(legend.title = element_blank()) 
+
 
 plot2 <- ggplot(summary_data_1, aes(x = Gender_Status, 
                          y = mean,
@@ -184,19 +185,13 @@ plot2 <- ggplot(summary_data_1, aes(x = Gender_Status,
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2) +
-  scale_fill_npg() + ylab("Voltage in microvolts")  +
-  ggtitle("Gender Status by Referentiality Interaction")
-  # scale_fill_brewer(palette = "Pastel1")
-  # scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_fill_npg() + ylab("Voltage in microvolts")+
+  theme(legend.text = element_text(size=10))+ 
+  theme(legend.title = element_blank()) 
 
-grid.arrange(plot1, plot2, ncol=2)
-```
 
-&nbsp;
 
-```{r}
-
-plot1 <- ggplot(summary_data_1, aes(x = Referentiality, 
+plot3 <- ggplot(summary_data_1, aes(x = Referentiality, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
@@ -208,11 +203,12 @@ plot1 <- ggplot(summary_data_1, aes(x = Referentiality,
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_colour_npg() + ylab("Voltage in microvolts")
-  #scale_fill_brewer(palette = "Pastel1")
-  #scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_colour_npg() + ylab("Voltage in microvolts")+
+  theme(legend.text = element_text(size=10))+ 
+  theme(legend.title = element_blank())
+ 
 
-plot2 <- ggplot(summary_data_1, aes(x = Gender_Status, 
+plot4 <- ggplot(summary_data_1, aes(x = Gender_Status, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
@@ -224,11 +220,13 @@ plot2 <- ggplot(summary_data_1, aes(x = Gender_Status,
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_colour_npg() + ylab("Voltage in microvolts")
-  #scale_fill_brewer(palette = "Pastel1")
-  #scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_colour_npg() + ylab("Voltage in microvolts")+
+  theme(legend.text = element_text(size=10))+ 
+  theme(legend.title = element_blank())
+ 
 
-grid.arrange(plot1, plot2, ncol=2)
+grid.arrange(plot1, plot3, plot2, plot4, ncol=2, 
+             top = "Gender Status by Referentiality Interaction")
 ```
 
 
@@ -350,9 +348,8 @@ plot1<- ggplot(summary_data_2, aes(x = Referentiality,
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
   scale_fill_npg() + ylab("Voltage in microvolts") +
-  ggtitle("Gender Status by Referentiality Interaction")
-  # scale_fill_brewer(palette = "Pastel1")
-  # scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  theme(legend.text = element_text(size=10))+ 
+  theme(legend.title = element_blank())
 
 plot2 <- ggplot(summary_data_2, aes(x = Gender_Status, 
                          y = mean,
@@ -365,18 +362,11 @@ plot2 <- ggplot(summary_data_2, aes(x = Gender_Status,
   geom_errorbar(width = .2, position = position_dodge(.9))  +
   geom_label_repel(show.legend = FALSE, cex = 2)+
   scale_fill_npg() + ylab("Voltage in microvolts") +
-  ggtitle("Gender Status by Referentiality Interaction")
-  # scale_fill_brewer(palette = "Pastel1")
-  # scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  theme(legend.text = element_text(size=10))+ 
+  theme(legend.title = element_blank())
+ 
 
-grid.arrange(plot1, plot2, ncol=2)
-```
-
-
-&nbsp;
-
-```{r}
-plot1 <- ggplot(summary_data_2, aes(x = Referentiality, 
+plot3<- ggplot(summary_data_2, aes(x = Referentiality, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
@@ -388,11 +378,12 @@ plot1 <- ggplot(summary_data_2, aes(x = Referentiality,
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025))  +
   geom_label_repel(show.legend = FALSE,cex = 2)+
-  scale_colour_npg() + ylab("Voltage in microvolts")
-  # scale_fill_brewer(palette = "Pastel1")
-  # scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  scale_colour_npg() + ylab("Voltage in microvolts")+ 
+  theme(legend.text = element_text(size=10))+ 
+  theme(legend.title = element_blank())
 
-plot2 <- ggplot(summary_data_2, aes(x = Gender_Status, 
+
+plot4 <- ggplot(summary_data_2, aes(x = Gender_Status, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
@@ -403,12 +394,14 @@ plot2 <- ggplot(summary_data_2, aes(x = Gender_Status,
   geom_point() + 
   geom_line() +
   geom_errorbar(width = .2, position = position_dodge(.025))  +
-  geom_label_repel(show.legend = FALSE,cex = 2)+
-  scale_colour_npg() + ylab("Voltage in microvolts")
-  # scale_fill_brewer(palette = "Pastel1")
-  # scale_fill_manual(values=c("cadetblue", "lightpink1"))
+  geom_label_repel(show.legend = FALSE,cex = 2) +
+  scale_colour_npg() + ylab("Voltage in microvolts") +
+  theme(legend.text = element_text(size=10)) + 
+  theme(legend.title = element_blank())
 
-grid.arrange(plot1, plot2, ncol=2)
+
+grid.arrange(plot1, plot3, plot2, plot4, ncol=2, 
+             top = "Gender Status by Referentiality Interaction")
 ```
 
 
