@@ -177,7 +177,7 @@ pander(t.test(diff_score ~ Gender_Status
        , paired=TRUE))
 ```
 
-##### Interaction Plots: Gender Status x Referentiality *himself*
+##### Interaction Plots
 &nbsp;
 
 ```{r}
@@ -263,84 +263,5 @@ grid.arrange(plot1, plot3, plot2, plot4, ncol=2,
 ```
 
 
-#### Interaction Plots:   Gender Status by Referentiality *themselves*
-
-
-&nbsp;
-
-```{r}
-summary_data_2 <- prost_2022_plural |> 
-  group_by(Gender_Status, Referentiality) |>
-  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
-  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
-summary_data_2$label = c("John...themselves","some man...themselves", "the participant...themselves", "someone...themselves")
-
-
-plot1<- ggplot(summary_data_2, aes(x = Referentiality, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         fill = Gender_Status, 
-                         group = Gender_Status,
-                         label = label)) + 
-  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
-  geom_errorbar(width = .2, position = position_dodge(.9))  +
-  geom_label_repel(show.legend = FALSE, cex = 1.5)+
-  scale_fill_npg() + ylab("Voltage in microvolts") +
-  theme(legend.text = element_text(size=10))+ 
-  theme(legend.title = element_blank())
-
-plot2 <- ggplot(summary_data_2, aes(x = Gender_Status, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         fill = Referentiality, 
-                         group = Referentiality,
-                         label = label)) + 
-  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
-  geom_errorbar(width = .2, position = position_dodge(.9))  +
-  geom_label_repel(show.legend = FALSE, cex = 1.5)+
-  scale_fill_npg() + ylab("Voltage in microvolts") +
-  theme(legend.text = element_text(size=10))+ 
-  theme(legend.title = element_blank())
- 
-
-plot3<- ggplot(summary_data_2, aes(x = Referentiality, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         colour = Gender_Status, 
-                         linetype= Gender_Status, 
-                         group = Gender_Status,
-                         label = label)) + 
-  geom_point() + 
-  geom_line() +
-  geom_errorbar(width = .2, position = position_dodge(.025))  +
-  geom_label_repel(show.legend = FALSE,cex = 1.5)+
-  scale_colour_npg() + ylab("Voltage in microvolts")+ 
-  theme(legend.text = element_text(size=10))+ 
-  theme(legend.title = element_blank())
-
-
-plot4 <- ggplot(summary_data_2, aes(x = Gender_Status, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         colour = Referentiality, 
-                         linetype= Referentiality, 
-                         group = Referentiality,
-                         label = label)) + 
-  geom_point() + 
-  geom_line() +
-  geom_errorbar(width = .2, position = position_dodge(.025))  +
-  geom_label_repel(show.legend = FALSE,cex = 1.5) +
-  scale_colour_npg() + ylab("Voltage in microvolts") +
-  theme(legend.text = element_text(size=10)) + 
-  theme(legend.title = element_blank())
-
-
-grid.arrange(plot1, plot3, plot2, plot4, ncol=2, 
-             top = "Gender Status by Referentiality Interaction")
-```
 
 
