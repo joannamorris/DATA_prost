@@ -116,7 +116,7 @@ kable(singular_means1 <- prost_2022_singular |>
             Min = min(diff_score)), digits = 2)
 
 kable(singular_means2 <- prost_2022_singular |> 
-  group_by(Anteriority, Group) |>
+  group_by(Group, Anteriority) |>
   summarise(Mean = mean(diff_score), 
             SE = sem(diff_score), 
             SD = sd(diff_score), 
@@ -124,7 +124,7 @@ kable(singular_means2 <- prost_2022_singular |>
             Min = min(diff_score)), digits = 2)
 
 kable(singular_means2 <- prost_2022_singular |> 
-  group_by(Referentiality, Gender_Status,Group) |>
+  group_by(Group, Referentiality,Gender_Status) |>
   summarise(Mean = mean(diff_score), 
             SE = sem(diff_score), 
             SD = sd(diff_score), 
