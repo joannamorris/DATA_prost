@@ -3,20 +3,15 @@ title: "PROST P600 combined groups analysis using lmer"
 author: "Joanna Morris"
 date: "`r Sys.Date()`"
 output: pdf_document
+fontsize: 10pt
 editor_options: 
   chunk_output_type: console
 ---
 
----
-title: "The P600 effect when singular gendered antecedents are co-indexed with (a) *himself* or *herself* (b) *themselves*"
-author: "Joanna Morris"
-date: "`r Sys.Date()`"
-output: pdf_document
-editor_options: 
-  chunk_output_type: console
----
+\scriptsize
 
-This script, on the advice of reviewer 1, conducts an ANOVA examining the P600 PROST data with Referentiality and Gender as within-subject variables. Gender Identity status will be examined as a post-hoc variable. Analysis 1 examines the data for antecedents that are co-indexed with *himself* or *herself*, while Analysis 2 examines the  P600 effect when antecedents are co-indexed with *themselves*
+
+This script, on the advice of reviewer 1, conducts an ANOVA examining the P600 PROST data with Referentiality, Gender and Anaphor Type as within-subject variables. Gender Identity status will be examined as a post-hoc variable. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, error = FALSE, message = FALSE, fig.dim = c(6, 6))
@@ -98,7 +93,7 @@ kable(res.aov)
 
 ## Analysis using EZANOVA
 
-```{r echo=TRUE, warning=FALSE, message=FALSE}
+```{r echo=TRUE, warning=FALSE, message=FALSE, comment=""}
 library(ez)
 fitted.model.1 <- ezANOVA(data = prost_2024_combined
               , dv = diff_score
@@ -107,7 +102,7 @@ fitted.model.1 <- ezANOVA(data = prost_2024_combined
               , type = 3
               , return_aov = F
               )
-kable(fitted.model.1)
+pander(fitted.model.1)
 ```
 
 
@@ -145,16 +140,27 @@ kable(two.way <- prost_2024_combined |>
 
 ```
 
+Can aslo compute these using lmer
+
+```{r}
+library(lme4)
+fitted.model.2a <- lmer(diff_score ~ Referentiality * Gender_Status  + (1|SubjID), data=filter(prost_2024_combined,Anaphor_Type == "singular" ))
+kable(Anova(fitted.model.2a))
+
+fitted.model.2b <- lmer(diff_score ~ Referentiality * Gender_Status  + (1|SubjID), data=filter(prost_2024_combined,Anaphor_Type == "plural" ))
+kable(Anova(fitted.model.2b))
+```
+
 ### Compute simple simple main effect
 
 A statistically significant simple two-way interaction can be followed up with simple simple main effects.
 
-Group the data by Anaphor_Type and Gender_Status, and analyze the simple main effect of Referentiality. The Bonferroni adjustment will be considered leading to statistical significance being accepted at the p < 0.025 level (that is 0.05 divided by the number of tests (here 2) considered for “diet:no” trial.
+Group the data by Anaphor_Type and Gender_Status, and analyze the simple main effect of Referentiality. The Bonferroni adjustment will be considered leading to statistical significance being accepted at the p < 0.025 level (that is 0.05 divided by the number of tests (here 2).
 
 ```{r}
 # Effect of Referentiality at each Anaphor_Type X Gender_Status cell
-kable(ref.effect <- prost_2024_combined %>%
-  group_by(Anaphor_Type, Gender_Status) %>%
+kable(ref.effect <- prost_2024_combined |>
+  group_by(Anaphor_Type, Gender_Status) |>
   anova_test(dv = diff_score, wid = SubjID, within = Referentiality) )
 ```
 
@@ -164,7 +170,7 @@ Perform pairwise comparisons between Referentiality levels with Bonferroni adjus
 # Pairwise comparisons
 pwc <- prost_2024_combined |>
   group_by(Anaphor_Type, Gender_Status) |>
-  pairwise_t_test(diff_score ~ Referentiality, paired = TRUE, p.adjust.method = "bonferroni") %>%
+  pairwise_t_test(diff_score ~ Referentiality, paired = TRUE, p.adjust.method = "bonferroni") |>
   select(-df, -statistic) # Remove details
 kable(pwc)
 
@@ -192,9 +198,9 @@ bxp2 <- ggplot(data = prost_2024_combined,
   geom_boxplot(staplewidth = .25) +
   facet_wrap(~ Anaphor_Type, ncol = 2) +
   labs(y = "Voltage Difference in microvolts", x = "Gender Status") +
-  theme_classic()+
-  scale_colour_hue(l=50, c=100)
-
+  theme_classic() +
+  scale_color_aaas() +
+  scale_fill_aaas(alpha = 0.3)
 bxp2
 
 ```
@@ -203,6 +209,7 @@ bxp2
 # Visualization: box plots with p-values
 
 ```{r}
+library(ggpubr)
 pwc <- pwc |> add_xy_position(x = "Gender_Status")
 pwc.filtered <- pwc |> 
   filter(Anaphor_Type == "singular", Gender_Status == "Gendered")
@@ -211,7 +218,8 @@ bxp2 +
   labs(
     subtitle = get_test_label(res.aov, detailed = TRUE),
     caption = get_pwc_label(pwc)
-  )
+  ) 
+  
 ```
 
 
