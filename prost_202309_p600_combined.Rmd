@@ -8,7 +8,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-This script, on the advice of reviewer 1, conducts an ANOVA examining the P600 PROST data with Referentiality and Gender as within variables. Gender Identity status will be examined as a post-hoc variable. Analysis 1 examines the data for antecedents that are co-indexed with *himself* or *herself*, while Analysis 2 examines the  P600 effect when antecedents are co-indexed with *themselves*
+This script, on the advice of reviewer 1, conducts an ANOVA examining the P600 PROST data with Referentiality and Gender as within-subject variables. Gender Identity status will be examined as a post-hoc variable. Analysis 1 examines the data for antecedents that are co-indexed with *himself* or *herself*, while Analysis 2 examines the  P600 effect when antecedents are co-indexed with *themselves*
 
 
 

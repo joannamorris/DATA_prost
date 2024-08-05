@@ -1,0 +1,253 @@
+---
+title: "PROST P600 combined groups analysis using lmer"
+author: "Joanna Morris"
+date: "`r Sys.Date()`"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+---
+
+---
+title: "The P600 effect when singular gendered antecedents are co-indexed with (a) *himself* or *herself* (b) *themselves*"
+author: "Joanna Morris"
+date: "`r Sys.Date()`"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+---
+
+This script, on the advice of reviewer 1, conducts an ANOVA examining the P600 PROST data with Referentiality and Gender as within-subject variables. Gender Identity status will be examined as a post-hoc variable. Analysis 1 examines the data for antecedents that are co-indexed with *himself* or *herself*, while Analysis 2 examines the  P600 effect when antecedents are co-indexed with *themselves*
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, error = FALSE, message = FALSE, fig.dim = c(6, 6))
+library(knitr)
+library(ggplot2)
+library(ggrepel)
+library(psych)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(pander)
+library(ggsci)
+library(ez)
+library(gridExtra)
+```
+
+
+
+## Define functions, set parameters and load
+
+Define standard error of mean function
+
+```{r echo=TRUE}
+sem <- function(x) sd(x)/sqrt(length(x))
+```
+
+Before we begin, let's set some general parameters for `ggplot2`. We will set a general theme using the `theme_set()` function. We will use the 'classic' theme which gives us clean white background rather than the default grey with white grid lines. We will position the legend at the top of the graph rather than at the right side which is the default.
+
+```{r theme}
+theme_set(theme_classic()+
+            theme(legend.position = "bottom")) 
+```
+
+
+```{r}
+prost_2022_singular <- read_csv("prost_2022_singular_p600.csv")
+prost_2022_plural <- read_csv("prost_2022_plural_p600.csv")
+prost_2024_combined <- bind_rows(list(singular = prost_2022_singular, 
+                                      plural = prost_2022_plural), .id = "Anaphor_Type")
+```
+
+Then we re-order factor levels for  *Referentiality*
+
+```{r}
+prost_2024_combined$Referentiality <- factor(prost_2024_combined$Referentiality, 
+                                            levels=c('Referential',
+                                                     'NonReferential'))
+levels(prost_2024_combined$Referentiality)
+
+```
+
+# Check ANOVA assumptions
+
+- *No significant outliers in any cell of the design*. This can be checked by visualizing the data using box plot methods and by using the function `identify_outliers()` in the `rstatix` package.
+
+```{r}
+library(rstatix)
+kable(identify_outliers(prost_2024_combined, diff_score))
+```
+
+- *Normality*: the outcome (or dependent) variable should be approximately normally distributed in each cell of the design. This can be checked using the Shapiro-Wilk normality test `shapiro_test()`in the `rstatix` package.
+
+```{r}
+kable(shapiro_test(prost_2024_combined, diff_score))
+```
+
+- *Assumption of sphericity*: the variance of the differences between groups should be equal. This can be checked using the Mauchly’s test of sphericity, which is automatically reported when using the R function `anova_test()` in the `rstatix` package.
+
+## Analysis using `rstatix()`
+
+```{r}
+res.aov <- anova_test(data = prost_2024_combined, 
+                      dv = diff_score, 
+                      wid = SubjID, 
+                      within = c(Referentiality, Gender_Status, Anaphor_Type))
+kable(res.aov)
+```
+
+
+## Analysis using EZANOVA
+
+```{r echo=TRUE, warning=FALSE, message=FALSE}
+library(ez)
+fitted.model.1 <- ezANOVA(data = prost_2024_combined
+              , dv = diff_score
+              , wid = SubjID
+              , within = .(Referentiality, Gender_Status, Anaphor_Type)
+              , type = 3
+              , return_aov = F
+              )
+kable(fitted.model.1)
+```
+
+
+## Analysis using lmer
+
+```{r echo=TRUE, warning=FALSE, message=FALSE}
+library(lme4)
+library(car)
+fitted.model.2 <- lmer(diff_score ~ Referentiality * Gender_Status * Anaphor_Type + (1|SubjID), data=prost_2024_combined)
+kable(Anova(fitted.model.2))
+```
+
+## Post-hoc tests
+
+If there is a significant three-way interaction effect, you can decompose it into:
+
+- *Simple two-way interaction*: run two-way interaction at each level of third variable,
+
+- *Simple simple main effect*: run one-way model at each level of second variable, and
+
+- *Simple simple pairwise comparisons*: run pairwise or other post-hoc comparisons if necessary.
+
+### Compute simple two-way interaction
+
+You are free to decide which two variables will form the simple two-way interactions and which variable will act as the third (moderator) variable. In the following R code, we have considered the simple two-way interaction of Referentiality*Gender Status at each level of Anaphor Type
+
+It is recommended to adjust the p-value for multiple testing (Bonferroni correction) by dividing the current $\alpha$-level you declare statistical significance at (i.e., p < 0.05) by the number of simple two-way interaction you are computing (i.e., 2). Thus two-way interaction as statistically significant when $p < 0.025$ (i.e., $p < 0.05/2$). 
+
+
+```{r}
+prost_2024_combined <- prost_2024_combined |> ungroup() |> group_by(Anaphor_Type)
+
+kable(two.way <- prost_2024_combined |>
+  anova_test(dv = diff_score, wid = SubjID, within = c(Referentiality, Gender_Status)))
+
+```
+
+### Compute simple simple main effect
+
+A statistically significant simple two-way interaction can be followed up with simple simple main effects.
+
+Group the data by Anaphor_Type and Gender_Status, and analyze the simple main effect of Referentiality. The Bonferroni adjustment will be considered leading to statistical significance being accepted at the p < 0.025 level (that is 0.05 divided by the number of tests (here 2) considered for “diet:no” trial.
+
+```{r}
+# Effect of Referentiality at each Anaphor_Type X Gender_Status cell
+kable(ref.effect <- prost_2024_combined %>%
+  group_by(Anaphor_Type, Gender_Status) %>%
+  anova_test(dv = diff_score, wid = SubjID, within = Referentiality) )
+```
+
+Perform pairwise comparisons between Referentiality levels with Bonferroni adjustment:
+
+```{r}
+# Pairwise comparisons
+pwc <- prost_2024_combined |>
+  group_by(Anaphor_Type, Gender_Status) |>
+  pairwise_t_test(diff_score ~ Referentiality, paired = TRUE, p.adjust.method = "bonferroni") %>%
+  select(-df, -statistic) # Remove details
+kable(pwc)
+
+```
+
+# Visualization: box plots 
+
+```{r}
+library(ggpubr)
+bxp <- ggboxplot(
+  prost_2024_combined, x = "Gender_Status", y = "diff_score",
+  color = "Referentiality", palette = "jco",
+  facet.by = "Anaphor_Type", short.panel.labs = FALSE
+  )
+bxp
+
+```
+
+```{r}
+prost_2024_combined <- ungroup(prost_2024_combined)
+library(ggplot2)
+library(ggsci)
+bxp2 <- ggplot(data = prost_2024_combined,
+       mapping = aes(x = Gender_Status, y = diff_score, colour = Referentiality)) +
+  geom_boxplot(staplewidth = .25) +
+  facet_wrap(~ Anaphor_Type, ncol = 2) +
+  labs(y = "Voltage Difference in microvolts", x = "Gender Status") +
+  theme_classic()+
+  scale_colour_hue(l=50, c=100)
+
+bxp2
+
+```
+
+
+# Visualization: box plots with p-values
+
+```{r}
+pwc <- pwc |> add_xy_position(x = "Gender_Status")
+pwc.filtered <- pwc |> 
+  filter(Anaphor_Type == "singular", Gender_Status == "Gendered")
+bxp2 + 
+  stat_pvalue_manual(pwc.filtered, tip.length = 0, hide.ns = TRUE) +
+  labs(
+    subtitle = get_test_label(res.aov, detailed = TRUE),
+    caption = get_pwc_label(pwc)
+  )
+```
+
+
+### Condition Means for Analysis 1
+
+Significant Effects: **Referentiality; Referentiality x Anaphor Type; Referentiality X Gender Status X Anaphor Type**
+
+```{r}
+
+kable(singular_means1 <- prost_2024_combined |> 
+  group_by(Referentiality) |>
+  summarise(Mean = mean(diff_score), 
+            SE = sem(diff_score), 
+            SD = sd(diff_score), 
+            Max = max(diff_score), 
+            Min = min(diff_score)), digits = 2)
+
+kable(singular_means1 <- prost_2024_combined |> 
+  group_by(Referentiality, Anaphor_Type) |>
+  summarise(Mean = mean(diff_score), 
+            SE = sem(diff_score), 
+            SD = sd(diff_score), 
+            Max = max(diff_score), 
+            Min = min(diff_score)), digits = 2)
+
+
+kable(singular_means2 <- prost_2024_combined |> 
+  group_by( Anaphor_Type, Referentiality,  Gender_Status) |>
+  summarise(Mean = mean(diff_score), 
+            SE = sem(diff_score), 
+            SD = sd(diff_score), 
+            Max = max(diff_score), 
+            Min = min(diff_score)), digits = 2)
+
+```
+
+
+
+
