@@ -83,11 +83,11 @@ kable(shapiro_test(prost_2024_combined, diff_score))
 ## Analysis using `rstatix()`
 
 ```{r}
-res.aov <- anova_test(data = prost_2024_combined, 
+fitted.model.0 <- anova_test(data = prost_2024_combined, 
                       dv = diff_score, 
                       wid = SubjID, 
                       within = c(Referentiality, Gender_Status, Anaphor_Type))
-kable(res.aov)
+kable(fitted.model.0)
 ```
 
 
