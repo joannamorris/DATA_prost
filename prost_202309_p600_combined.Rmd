@@ -1,19 +1,20 @@
-
 ---
-title: "The P600 effect when singular gendered antecedents are co-indexed with (a) *himself* or *herself* (b) *themselves*"
+title: "PROST P600 combined groups analysis using lmer"
 author: "Joanna Morris"
 date: "`r Sys.Date()`"
 output: pdf_document
+fontsize: 10pt
 editor_options: 
   chunk_output_type: console
 ---
 
-This script, on the advice of reviewer 1, conducts an ANOVA examining the P600 PROST data with Referentiality and Gender as within-subject variables. Gender Identity status will be examined as a post-hoc variable. Analysis 1 examines the data for antecedents that are co-indexed with *himself* or *herself*, while Analysis 2 examines the  P600 effect when antecedents are co-indexed with *themselves*
+\scriptsize
 
 
+This script, on the advice of reviewer 1, conducts an ANOVA examining the P600 PROST data with Referentiality, Gender and Anaphor Type as within-subject variables. Gender Identity status will be examined as a post-hoc variable. 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, fig.dim = c(6, 6))
+knitr::opts_chunk$set(warning = FALSE, error = FALSE, message = FALSE, fig.dim = c(6, 6))
 library(knitr)
 library(ggplot2)
 library(ggrepel)
@@ -37,7 +38,7 @@ Define standard error of mean function
 sem <- function(x) sd(x)/sqrt(length(x))
 ```
 
-Before we begin, let's set some general parameters for `ggplot2`. We will set a general theme using the `theme_set()` function. We will use the 'classic' theme which gives us clean white background rather than the default grey with white grid lines. We will position the legend at the top of the graph rather than at the right side which is the default.
+Set  general parameters for `ggplot2`. We will set a general theme using the `theme_set()` function. We will use the 'classic' theme which gives us clean white background rather than the default grey with white grid lines. We will position the legend at the top of the graph rather than at the right side which is the default.
 
 ```{r theme}
 theme_set(theme_classic()+
@@ -48,35 +49,203 @@ theme_set(theme_classic()+
 ```{r}
 prost_2022_singular <- read_csv("prost_2022_singular_p600.csv")
 prost_2022_plural <- read_csv("prost_2022_plural_p600.csv")
-prost_2024_combined <- bind_rows(list(singular = prost_2022_singular, 
-                                      plural = prost_2022_plural), .id = "Anaphor_Type")
+prost_2024_combined <- bind_rows(list("Gendered Singular" = prost_2022_singular, 
+                                     "NonGendered Plural" = prost_2022_plural), .id = "Anaphor_Type")
 ```
 
-Then we re-order factor levels for  *Referentiality*
+## Re-order factor levels for  *Referentiality* and *Anaphor_Type*
 
-```{r}
+```{r results='hide'}
 prost_2024_combined$Referentiality <- factor(prost_2024_combined$Referentiality, 
                                             levels=c('Referential',
                                                      'NonReferential'))
+prost_2024_combined$Anaphor_Type <- factor(prost_2024_combined$Anaphor_Type, 
+                                            levels=c('Gendered Singular',
+                                                     'NonGendered Plural'))
 levels(prost_2024_combined$Referentiality)
-
+levels(prost_2024_combined$Anaphor_Type)
 ```
 
-## Analysis 
+# Check ANOVA assumptions
 
-```{r echo=TRUE}
+- *No significant outliers in any cell of the design*. This can be checked by visualizing the data using box plot methods and by using the function `identify_outliers()` in the `rstatix` package.
 
-ezANOVA(data = prost_2024_combined
+```{r}
+library(rstatix)
+kable(identify_outliers(prost_2024_combined, diff_score))
+```
+
+- *Normality*: the outcome (or dependent) variable should be approximately normally distributed in each cell of the design. This can be checked using the Shapiro-Wilk normality test `shapiro_test()`in the `rstatix` package.
+
+```{r}
+kable(shapiro_test(prost_2024_combined, diff_score))
+```
+
+- *Assumption of sphericity*: the variance of the differences between groups should be equal. This can be checked using the Mauchly’s test of sphericity, which is automatically reported when using the R function `anova_test()` in the `rstatix` package.
+
+
+## Analysis using `rstatix()`
+
+```{r}
+fitted.model.0 <- anova_test(data = prost_2024_combined, 
+                      dv = diff_score, 
+                      wid = SubjID, 
+                      within = c(Referentiality, Gender_Status, Anaphor_Type))
+kable(fitted.model.0)
+```
+
+
+## Analysis using EZANOVA
+
+```{r echo=TRUE, warning=FALSE, message=FALSE, comment=""}
+library(ez)
+fitted.model.1 <- ezANOVA(data = prost_2024_combined
               , dv = diff_score
               , wid = SubjID
               , within = .(Referentiality, Gender_Status, Anaphor_Type)
               , type = 3
               , return_aov = F
               )
+pander(fitted.model.1)
+```
+
+
+## Analysis using lmer
+
+```{r echo=TRUE, warning=FALSE, message=FALSE}
+library(lme4)
+library(car)
+fitted.model.2 <- lmer(diff_score ~ Referentiality * Gender_Status * Anaphor_Type + (1|SubjID), data=prost_2024_combined)
+kable(Anova(fitted.model.2))
+```
+
+## Post-hoc tests
+
+If there is a significant three-way interaction effect, you can decompose it into:
+
+- *Simple two-way interaction*: run two-way interaction at each level of third variable,
+
+- *Simple simple main effect*: run one-way model at each level of second variable, and
+
+- *Simple simple pairwise comparisons*: run pairwise or other post-hoc comparisons if necessary.
+
+### Compute simple two-way interaction
+
+You are free to decide which two variables will form the simple two-way interactions and which variable will act as the third (moderator) variable. In the following R code, we have considered the simple two-way interaction of Referentiality*Gender Status at each level of Anaphor Type
+
+It is recommended to adjust the p-value for multiple testing (Bonferroni correction) by dividing the current $\alpha$-level you declare statistical significance at (i.e., p < 0.05) by the number of simple two-way interaction you are computing (i.e., 2). Thus two-way interaction as statistically significant when $p < 0.025$ (i.e., $p < 0.05/2$). 
+
+
+```{r}
+prost_2024_combined <- prost_2024_combined |> ungroup() |> group_by(Anaphor_Type)
+
+kable(two.way <- prost_2024_combined |>
+  anova_test(dv = diff_score, wid = SubjID, within = c(Referentiality, Gender_Status)))
+
+```
+
+Can also compute these using lmer
+
+```{r}
+library(lme4)
+fitted.model.2a <- lmer(diff_score ~ Referentiality * Gender_Status  + (1|SubjID), data=filter(prost_2024_combined,Anaphor_Type == "Gendered Singular" ))
+kable(Anova(fitted.model.2a))
+
+fitted.model.2b <- lmer(diff_score ~ Referentiality * Gender_Status  + (1|SubjID), data=filter(prost_2024_combined,Anaphor_Type == "NonGendered Plural" ))
+kable(Anova(fitted.model.2b))
+```
+
+### Compute simple simple main effect using `anova_test()` function in the `rstatix` package
+
+A statistically significant simple two-way interaction can be followed up with simple simple main effects.
+
+Group the data by Anaphor_Type and Gender_Status, and analyze the simple main effect of Referentiality. The Bonferroni adjustment will be considered leading to statistical significance being accepted at the p < 0.025 level (that is 0.05 divided by the number of tests (here 2).
+
+```{r}
+# Effect of Referentiality at each Anaphor_Type X Gender_Status cell
+kable(ref.effect <- prost_2024_combined |>
+  group_by(Anaphor_Type, Gender_Status) |>
+  anova_test(dv = diff_score, wid = SubjID, within = Referentiality) )
+```
+
+### Compute simple simple main effects with Bonferroni adjustment using `pwc()` function in the `rstatix`
+
+```{r}
+# Pairwise comparisons
+pwc <- prost_2024_combined |>
+  group_by(Anaphor_Type, Gender_Status) |>
+  pairwise_t_test(diff_score ~ Referentiality, paired = TRUE, p.adjust.method = "bonferroni") |>
+  select(-df, -statistic) # Remove details
+kable(pwc)
+
+```
+
+### Compute simple simple main effects using `t.test()` function 
+
+Create 4 separate dataframes for each test in order to do paired test.  Below I run an unpaired test after each paired test just to see what how different they are..
+
+```{r}
+singular.gendered <- prost_2022_singular |> filter(Gender_Status == "Gendered")
+singular.nongendered <- prost_2022_singular |> filter(Gender_Status == "NonGendered")
+plural.gendered <- prost_2022_plural |> filter(Gender_Status == "Gendered")
+plural.nongendered <- prost_2022_plural |> filter(Gender_Status == "NonGendered")
+```
+
+"Some woman...himself" vs. "Mary...himself"  
+
+```{r}
+  
+pander(t.test(singular.gendered$diff_score[singular.gendered$Referentiality == "Referential"],
+              singular.gendered$diff_score[singular.gendered$Referentiality == "NonReferential"], 
+              paired = TRUE))
+
+pander(t.test(diff_score ~ Referentiality,
+              filter(prost_2024_combined, 
+                     Anaphor_Type == "Gendered Singular" & Gender_Status == "Gendered" )))
+
+
+
+```
+
+"Someone...himself" vs. "The participant...himself" 
+
+
+
+```{r}
+pander(t.test(singular.nongendered$diff_score[singular.nongendered$Referentiality == "Referential"],
+              singular.nongendered$diff_score[singular.nongendered$Referentiality == "NonReferential"], 
+              paired = TRUE))
+
+pander (t.test(diff_score ~ Referentiality,
+               filter(prost_2024_combined, 
+                      Anaphor_Type == "Gendered Singular" & Gender_Status == "NonGendered")))
+```
+
+"Some woman...themselves" vs. "Mary..themselves"  
+
+```{r}
+pander(t.test(plural.gendered$diff_score[plural.gendered$Referentiality == "Referential"],
+              plural.gendered$diff_score[plural.gendered$Referentiality == "NonReferential"], 
+              paired = TRUE))
+
+pander(t.test(diff_score ~ Referentiality,
+              filter(prost_2024_combined,
+                     Anaphor_Type == "NonGendered Plural" & Gender_Status == "Gendered")))
+```
+
+"Someone...themselves" vs. "The participant...themselves"  
+ 
+```{r}
+pander(t.test(plural.nongendered$diff_score[plural.gendered$Referentiality == "Referential"],
+              plural.nongendered$diff_score[plural.gendered$Referentiality == "NonReferential"], 
+              paired = TRUE))
+
+pander(t.test(diff_score ~ Referentiality,
+              filter(prost_2024_combined,
+                     Anaphor_Type == "NonGendered Plural" & Gender_Status == "NonGendered" )))
 ```
 
 ### Condition Means for Analysis 1
-
 
 Significant Effects: **Referentiality; Referentiality x Anaphor Type; Referentiality X Gender Status X Anaphor Type**
 
@@ -100,7 +269,7 @@ kable(singular_means1 <- prost_2024_combined |>
 
 
 kable(singular_means2 <- prost_2024_combined |> 
-  group_by( Anaphor_Type, Referentiality,  Gender_Status) |>
+  group_by( Anaphor_Type, Gender_Status,  Referentiality) |>
   summarise(Mean = mean(diff_score), 
             SE = sem(diff_score), 
             SD = sd(diff_score), 
@@ -109,158 +278,60 @@ kable(singular_means2 <- prost_2024_combined |>
 
 ```
 
-### Post-hoc tests 
-
-Runs post-hoc tests for the 3-way ***"Gender Status x Referentiality"*** Interaction
-
-
-"Some woman...himself" vs. "Mary...himself"  
+# Visualization: Box plots with p-values
 
 ```{r}
-pander(t.test(diff_score ~ Referentiality
-       , filter(prost_2022_singular, Gender_Status == "Gendered")
-       , paired=TRUE))
+prost_2024_combined <- ungroup(prost_2024_combined)
+library(ggplot2)
+library(ggsci)
+library(ggpubr)
+
+bxp2 <- ggplot(data = prost_2024_combined,
+       mapping = aes(x = Gender_Status, y = diff_score, colour = Referentiality)) +
+  geom_boxplot(staplewidth = .25) +
+  facet_wrap(~ Anaphor_Type, ncol = 2) +
+  labs(y = "Voltage Difference in microvolts", x = "Gender Status") +
+  theme_classic() +
+  scale_color_aaas() +
+  scale_fill_aaas(alpha = 0.3)
+
+
+pwc <- pwc |> add_xy_position(x = "Gender_Status")
+pwc.filtered <- pwc |> 
+  filter(Anaphor_Type == "Gendered Singular", Gender_Status == "Gendered")
+bxp2 + 
+  stat_pvalue_manual(pwc, tip.length = 0, hide.ns = TRUE) +
+  labs(subtitle = get_test_label(fitted.model.0, detailed = TRUE), caption = get_pwc_label(pwc)) 
 ```
 
-"Someone...himself" vs. "The participant...himself" 
+# Visualization: Bar chart
 
 ```{r}
-pander(t.test(diff_score ~ Referentiality
-       , filter(prost_2022_singular, Gender_Status == "NonGendered")
-       , paired=TRUE))
-```
-
-"The participant...himself" vs. "Mary...himself"  
-
-```{r}
-pander(t.test(diff_score ~ Gender_Status
-       , filter(prost_2022_singular, Referentiality == "Referential")
-       , paired=TRUE))
-```
-
-"Someone...himself" vs. "Some woman...himself"  
- 
-```{r}
-pander(t.test(diff_score ~ Gender_Status
-       , filter(prost_2022_singular, Referentiality == "NonReferential" )
-       , paired=TRUE))
-```
-"Some woman...themselves" vs. "Mary...themselves"  
-
-```{r}
-pander(t.test(diff_score ~ Referentiality
-       , filter(prost_2022_plural, Gender_Status == "Gendered")
-       , paired=TRUE))
-```
-
-"Someone...themselves" vs. "The participant...themselves" 
-
-```{r}
-pander(t.test(diff_score ~ Referentiality
-       , filter(prost_2022_plural, Gender_Status == "NonGendered")
-       , paired=TRUE))
-```
-
-"The participant...themselves" vs. "Mary...themselves"  
-
-```{r}
-pander(t.test(diff_score ~ Gender_Status
-       , filter(prost_2022_plural, Referentiality == "Referential")
-       , paired=TRUE))
-```
-
-"Someone...themselves" vs. "Some woman...themselves"  
- 
-```{r}
-pander(t.test(diff_score ~ Gender_Status
-       , filter(prost_2022_plural, Referentiality == "NonReferential" )
-       , paired=TRUE))
-```
-
-##### Interaction Plots
-&nbsp;
-
-```{r}
-summary_data_1 <- prost_2024_combined |>
-  filter(Anaphor_Type == "singular") |>
-  group_by(Gender_Status, Referentiality) |>
-  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
-  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
-summary_data_1$label = c("John...herself","some man...herself","the participant...herself", "someone...herself" )
-
-
-plot1 <- ggplot(summary_data_1, aes(x = Referentiality, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         fill = Gender_Status, 
-                         group = Gender_Status,
-                         label = label)) + 
-  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
-  geom_errorbar(width = .2, position = position_dodge(.9))  +
-  geom_label_repel(show.legend = FALSE, cex = 1.5) +
-  scale_fill_npg() + ylab("Voltage in microvolts") +
-  theme(legend.text = element_text(size=10))+ 
-  theme(legend.title = element_blank()) 
-
-
-plot2 <- ggplot(summary_data_1, aes(x = Gender_Status, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         fill = Referentiality, 
-                         group = Referentiality,
-                         label = label)) + 
-  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
-  geom_errorbar(width = .2, position = position_dodge(.9))  +
-  geom_label_repel(show.legend = FALSE, cex = 1.5) +
-  scale_fill_npg() + ylab("Voltage in microvolts")+
-  theme(legend.text = element_text(size=10))+ 
-  theme(legend.title = element_blank()) 
-
-#plot1
-#plot2
-
 summary_data_2 <- prost_2024_combined |>
-  filter(Anaphor_Type == "plural") |>
-  group_by(Gender_Status, Referentiality) |>
+  group_by(Anaphor_Type,Gender_Status, Referentiality) |>
   summarise(mean = mean(diff_score), se = sem(diff_score))|> 
   mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
-summary_data_2$label = c("John...themselves","some man...themselves","the participant...themselves", "someone...themselves" )
+summary_data_2$label = c("John...herself","some man...herself","the participant...herself", "someone...herself", "John...themselves", "some man...themselves", "the participant...themselves", "someone...themselves" )
 
-
-plot3 <- ggplot(summary_data_2, aes(x = Referentiality, 
+(plotA <- ggplot(summary_data_2, aes(x = Gender_Status, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
-                         fill = Gender_Status, 
-                         group = Gender_Status,
+                         fill = Referentiality,
+                         colour = Referentiality,
                          label = label)) + 
-  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
-  geom_errorbar(width = .2, position = position_dodge(.9))  +
-  geom_label_repel(show.legend = FALSE, cex = 1.5) +
-  scale_fill_npg() + ylab("Voltage in microvolts") +
-  theme(legend.text = element_text(size=10))+ 
-  theme(legend.title = element_blank()) 
-
-
-plot4 <- ggplot(summary_data_2, aes(x = Gender_Status, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         fill = Referentiality, 
-                         group = Referentiality,
-                         label = label)) + 
-  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
-  geom_errorbar(width = .2, position = position_dodge(.9))  +
-  geom_label_repel(show.legend = FALSE, cex = 1.5) +
-  scale_fill_npg() + ylab("Voltage in microvolts")+
-  theme(legend.text = element_text(size=10))+ 
-  theme(legend.title = element_blank()) 
-
-grid.arrange(plot1, plot3, plot2, plot4, ncol=2, 
-             top = "Gender Status by Referentiality Interaction")
+    geom_bar(position=position_dodge(), stat="identity") + 
+    geom_errorbar(width = .15, position = position_dodge(.9), colour = "black")  +
+    geom_label_repel(show.legend = FALSE, cex = 1.5, colour = "black") +
+    ylab("Voltage in microvolts") +
+    theme(legend.text = element_text(size=10))+ 
+    theme(legend.title = element_blank()) +
+    facet_wrap(~ Anaphor_Type, ncol = 2) +
+    scale_color_npg() +
+    scale_fill_npg(alpha = 0.8))
 ```
+
+
 
 
 
