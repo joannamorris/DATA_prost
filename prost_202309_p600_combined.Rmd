@@ -45,6 +45,7 @@ theme_set(theme_classic()+
             theme(legend.position = "bottom")) 
 ```
 
+## Load the Data
 
 ```{r}
 prost_2022_singular <- read_csv("prost_2022_singular_p600.csv")
@@ -125,7 +126,7 @@ If there is a significant three-way interaction effect, you can decompose it int
 
 - *Simple two-way interaction*: run two-way interaction at each level of third variable,
 
-- *Simple simple main effect*: run one-way model at each level of second variable, and
+- *Simple simple main effect*: run one-way model at each level of second variable, and/or
 
 - *Simple simple pairwise comparisons*: run pairwise or other post-hoc comparisons if necessary.
 
@@ -141,7 +142,6 @@ prost_2024_combined <- prost_2024_combined |> ungroup() |> group_by(Anaphor_Type
 
 kable(two.way <- prost_2024_combined |>
   anova_test(dv = diff_score, wid = SubjID, within = c(Referentiality, Gender_Status)))
-
 ```
 
 Can also compute these using lmer
@@ -155,7 +155,7 @@ fitted.model.2b <- lmer(diff_score ~ Referentiality * Gender_Status  + (1|SubjID
 kable(Anova(fitted.model.2b))
 ```
 
-### Compute simple simple main effect using `anova_test()` function in the `rstatix` package
+### 1 Compute simple simple main effects using `anova_test()` function in the `rstatix` package
 
 A statistically significant simple two-way interaction can be followed up with simple simple main effects.
 
@@ -168,14 +168,13 @@ kable(ref.effect <- prost_2024_combined |>
   anova_test(dv = diff_score, wid = SubjID, within = Referentiality) )
 ```
 
-### Compute simple simple main effects with Bonferroni adjustment using `pwc()` function in the `rstatix`
+### 2 Compute simple simple main effects with Bonferroni adjustment using `pwc()` function in the `rstatix`
 
 ```{r}
 # Pairwise comparisons
 pwc <- prost_2024_combined |>
   group_by(Anaphor_Type, Gender_Status) |>
-  pairwise_t_test(diff_score ~ Referentiality, paired = TRUE, p.adjust.method = "bonferroni") |>
-  select(-df, -statistic) # Remove details
+  pairwise_t_test(diff_score ~ Referentiality, paired = TRUE, p.adjust.method = "bonferroni") 
 kable(pwc)
 
 ```

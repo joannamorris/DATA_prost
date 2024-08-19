@@ -1,0 +1,1384 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  10pt,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={PROST P600 combined groups analysis using lmer},
+  pdfauthor={Joanna Morris},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{PROST P600 combined groups analysis using lmer}
+\author{Joanna Morris}
+\date{2024-08-19}
+
+\begin{document}
+\maketitle
+
+\scriptsize
+
+This script, on the advice of reviewer 1, conducts an ANOVA examining
+the P600 PROST data with Referentiality, Gender and Anaphor Type as
+within-subject variables. Gender Identity status will be examined as a
+post-hoc variable.
+
+\subsection{Define functions, set parameters and
+load}\label{define-functions-set-parameters-and-load}
+
+Define standard error of mean function
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sem }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{sd}\NormalTok{(x)}\SpecialCharTok{/}\FunctionTok{sqrt}\NormalTok{(}\FunctionTok{length}\NormalTok{(x))}
+\end{Highlighting}
+\end{Shaded}
+
+Set general parameters for \texttt{ggplot2}. We will set a general theme
+using the \texttt{theme\_set()} function. We will use the `classic'
+theme which gives us clean white background rather than the default grey
+with white grid lines. We will position the legend at the top of the
+graph rather than at the right side which is the default.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{theme\_set}\NormalTok{(}\FunctionTok{theme\_classic}\NormalTok{()}\SpecialCharTok{+}
+            \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"bottom"}\NormalTok{)) }
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Load the Data}\label{load-the-data}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{prost\_2022\_singular }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"prost\_2022\_singular\_p600.csv"}\NormalTok{)}
+\NormalTok{prost\_2022\_plural }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"prost\_2022\_plural\_p600.csv"}\NormalTok{)}
+\NormalTok{prost\_2024\_combined }\OtherTok{\textless{}{-}} \FunctionTok{bind\_rows}\NormalTok{(}\FunctionTok{list}\NormalTok{(}\StringTok{"Gendered Singular"} \OtherTok{=}\NormalTok{ prost\_2022\_singular, }
+                                     \StringTok{"NonGendered Plural"} \OtherTok{=}\NormalTok{ prost\_2022\_plural), }\AttributeTok{.id =} \StringTok{"Anaphor\_Type"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{\texorpdfstring{Re-order factor levels for
+\emph{Referentiality} and
+\emph{Anaphor\_Type}}{Re-order factor levels for Referentiality and Anaphor\_Type}}\label{re-order-factor-levels-for-referentiality-and-anaphor_type}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{prost\_2024\_combined}\SpecialCharTok{$}\NormalTok{Referentiality }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(prost\_2024\_combined}\SpecialCharTok{$}\NormalTok{Referentiality, }
+                                            \AttributeTok{levels=}\FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}Referential\textquotesingle{}}\NormalTok{,}
+                                                     \StringTok{\textquotesingle{}NonReferential\textquotesingle{}}\NormalTok{))}
+\NormalTok{prost\_2024\_combined}\SpecialCharTok{$}\NormalTok{Anaphor\_Type }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(prost\_2024\_combined}\SpecialCharTok{$}\NormalTok{Anaphor\_Type, }
+                                            \AttributeTok{levels=}\FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}Gendered Singular\textquotesingle{}}\NormalTok{,}
+                                                     \StringTok{\textquotesingle{}NonGendered Plural\textquotesingle{}}\NormalTok{))}
+\FunctionTok{levels}\NormalTok{(prost\_2024\_combined}\SpecialCharTok{$}\NormalTok{Referentiality)}
+\FunctionTok{levels}\NormalTok{(prost\_2024\_combined}\SpecialCharTok{$}\NormalTok{Anaphor\_Type)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Check ANOVA assumptions}\label{check-anova-assumptions}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{No significant outliers in any cell of the design}. This can be
+  checked by visualizing the data using box plot methods and by using
+  the function \texttt{identify\_outliers()} in the \texttt{rstatix}
+  package.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(rstatix)}
+\FunctionTok{kable}\NormalTok{(}\FunctionTok{identify\_outliers}\NormalTok{(prost\_2024\_combined, diff\_score))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1638}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0603}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1293}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.1207}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0862}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0776}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0776}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0948}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0948}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.0948}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Anaphor\_Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+SubjID
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Referentiality
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Gender\_Status
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Group
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Baseline
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Critical
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+diff\_score
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+is.outlier
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+is.extreme
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Gendered Singular & 203 & NonReferential & Gendered & Binary & -2.43645
+& 2.24315 & 4.67960 & TRUE & FALSE \\
+Gendered Singular & 207 & Referential & Gendered & Binary & 3.27080 &
+-0.69125 & -3.96205 & TRUE & FALSE \\
+Gendered Singular & 216 & Referential & Gendered & Binary & 3.30220 &
+-1.11125 & -4.41345 & TRUE & FALSE \\
+Gendered Singular & 221 & NonReferential & Gendered & Binary & 0.71770 &
+5.81575 & 5.09805 & TRUE & FALSE \\
+Gendered Singular & 305 & NonReferential & Gendered & NonBinary &
+0.12800 & 6.65140 & 6.52340 & TRUE & FALSE \\
+Gendered Singular & 312 & NonReferential & Gendered & NonBinary &
+-1.43700 & 3.31660 & 4.75360 & TRUE & FALSE \\
+NonGendered Plural & 216 & Referential & NonGendered & Binary & 2.37845
+& -1.65425 & -4.03270 & TRUE & FALSE \\
+NonGendered Plural & 222 & NonReferential & NonGendered & Binary &
+2.17760 & -2.10860 & -4.28620 & TRUE & FALSE \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Normality}: the outcome (or dependent) variable should be
+  approximately normally distributed in each cell of the design. This
+  can be checked using the Shapiro-Wilk normality test
+  \texttt{shapiro\_test()}in the \texttt{rstatix} package.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{kable}\NormalTok{(}\FunctionTok{shapiro\_test}\NormalTok{(prost\_2024\_combined, diff\_score))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lrr@{}}
+\toprule\noalign{}
+variable & statistic & p \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+diff\_score & 0.9918709 & 0.0938187 \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Assumption of sphericity}: the variance of the differences
+  between groups should be equal. This can be checked using the
+  Mauchly's test of sphericity, which is automatically reported when
+  using the R function \texttt{anova\_test()} in the \texttt{rstatix}
+  package.
+\end{itemize}
+
+\subsection{\texorpdfstring{Analysis using
+\texttt{rstatix()}}{Analysis using rstatix()}}\label{analysis-using-rstatix}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fitted.model}\FloatTok{.0} \OtherTok{\textless{}{-}} \FunctionTok{anova\_test}\NormalTok{(}\AttributeTok{data =}\NormalTok{ prost\_2024\_combined, }
+                      \AttributeTok{dv =}\NormalTok{ diff\_score, }
+                      \AttributeTok{wid =}\NormalTok{ SubjID, }
+                      \AttributeTok{within =} \FunctionTok{c}\NormalTok{(Referentiality, Gender\_Status, Anaphor\_Type))}
+\FunctionTok{kable}\NormalTok{(fitted.model}\FloatTok{.0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.5185}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0494}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0494}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0864}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.0741}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1111}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Effect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+DFn
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+DFd
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+F
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+p\textless.05
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+ges
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Referentiality & 1 & 37 & 6.212 & 1.70e-02 & * & 0.019000 \\
+Gender\_Status & 1 & 37 & 2.094 & 1.56e-01 & & 0.008000 \\
+Anaphor\_Type & 1 & 37 & 0.317 & 5.77e-01 & & 0.000985 \\
+Referentiality:Gender\_Status & 1 & 37 & 0.136 & 7.15e-01 & &
+0.000602 \\
+Referentiality:Anaphor\_Type & 1 & 37 & 28.976 & 4.30e-06 & * &
+0.080000 \\
+Gender\_Status:Anaphor\_Type & 1 & 37 & 0.410 & 5.26e-01 & & 0.001000 \\
+Referentiality:Gender\_Status:Anaphor\_Type & 1 & 37 & 11.701 & 2.00e-03
+& * & 0.036000 \\
+\end{longtable}
+
+\subsection{Analysis using EZANOVA}\label{analysis-using-ezanova}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ez)}
+\NormalTok{fitted.model}\FloatTok{.1} \OtherTok{\textless{}{-}} \FunctionTok{ezANOVA}\NormalTok{(}\AttributeTok{data =}\NormalTok{ prost\_2024\_combined}
+\NormalTok{              , }\AttributeTok{dv =}\NormalTok{ diff\_score}
+\NormalTok{              , }\AttributeTok{wid =}\NormalTok{ SubjID}
+\NormalTok{              , }\AttributeTok{within =}\NormalTok{ .(Referentiality, Gender\_Status, Anaphor\_Type)}
+\NormalTok{              , }\AttributeTok{type =} \DecValTok{3}
+\NormalTok{              , }\AttributeTok{return\_aov =}\NormalTok{ F}
+\NormalTok{              )}
+\FunctionTok{pander}\NormalTok{(fitted.model}\FloatTok{.1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\item
+  \textbf{ANOVA}:
+
+  \begin{longtable}[]{@{}
+    >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1216}}
+    >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.5946}}
+    >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0811}}
+    >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0811}}
+    >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1216}}@{}}
+  \caption{Table continues below}\tabularnewline
+  \toprule\noalign{}
+  \begin{minipage}[b]{\linewidth}\centering
+  ~
+  \end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+  Effect
+  \end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+  DFn
+  \end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+  DFd
+  \end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+  F
+  \end{minipage} \\
+  \midrule\noalign{}
+  \endfirsthead
+  \toprule\noalign{}
+  \begin{minipage}[b]{\linewidth}\centering
+  ~
+  \end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+  Effect
+  \end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+  DFn
+  \end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+  DFd
+  \end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+  F
+  \end{minipage} \\
+  \midrule\noalign{}
+  \endhead
+  \bottomrule\noalign{}
+  \endlastfoot
+  \textbf{2} & Referentiality & 1 & 37 & 6.212 \\
+  \textbf{3} & Gender\_Status & 1 & 37 & 2.094 \\
+  \textbf{4} & Anaphor\_Type & 1 & 37 & 0.3171 \\
+  \textbf{5} & Referentiality:Gender\_Status & 1 & 37 & 0.1358 \\
+  \textbf{6} & Referentiality:Anaphor\_Type & 1 & 37 & 28.98 \\
+  \textbf{7} & Gender\_Status:Anaphor\_Type & 1 & 37 & 0.4098 \\
+  \textbf{8} & Referentiality:Gender\_Status:Anaphor\_Type & 1 & 37 &
+  11.7 \\
+  \end{longtable}
+
+  \begin{longtable}[]{@{}
+    >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1250}}
+    >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1667}}
+    >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1111}}
+    >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1667}}@{}}
+  \toprule\noalign{}
+  \begin{minipage}[b]{\linewidth}\centering
+  ~
+  \end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+  p
+  \end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+  p\textless.05
+  \end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+  ges
+  \end{minipage} \\
+  \midrule\noalign{}
+  \endhead
+  \bottomrule\noalign{}
+  \endlastfoot
+  \textbf{2} & 0.0173 & * & 0.01894 \\
+  \textbf{3} & 0.1563 & & 0.008441 \\
+  \textbf{4} & 0.5768 & & 0.0009849 \\
+  \textbf{5} & 0.7146 & & 0.0006023 \\
+  \textbf{6} & 4.299e-06 & * & 0.08024 \\
+  \textbf{7} & 0.526 & & 0.001088 \\
+  \textbf{8} & 0.001537 & * & 0.03579 \\
+  \end{longtable}
+\end{itemize}
+
+\subsection{Analysis using lmer}\label{analysis-using-lmer}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(lme4)}
+\FunctionTok{library}\NormalTok{(car)}
+\NormalTok{fitted.model}\FloatTok{.2} \OtherTok{\textless{}{-}} \FunctionTok{lmer}\NormalTok{(diff\_score }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Referentiality }\SpecialCharTok{*}\NormalTok{ Gender\_Status }\SpecialCharTok{*}\NormalTok{ Anaphor\_Type }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{SubjID), }\AttributeTok{data=}\NormalTok{prost\_2024\_combined)}
+\FunctionTok{kable}\NormalTok{(}\FunctionTok{Anova}\NormalTok{(fitted.model}\FloatTok{.2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lrrr@{}}
+\toprule\noalign{}
+& Chisq & Df & Pr(\textgreater Chisq) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Referentiality & 5.7358431 & 1 & 0.0166221 \\
+Gender\_Status & 2.5294548 & 1 & 0.1117388 \\
+Anaphor\_Type & 0.2929198 & 1 & 0.5883555 \\
+Referentiality:Gender\_Status & 0.1790786 & 1 & 0.6721663 \\
+Referentiality:Anaphor\_Type & 25.9197219 & 1 & 0.0000004 \\
+Gender\_Status:Anaphor\_Type & 0.3236341 & 1 & 0.5694318 \\
+Referentiality:Gender\_Status:Anaphor\_Type & 11.0278606 & 1 &
+0.0008975 \\
+\end{longtable}
+
+\subsection{Post-hoc tests}\label{post-hoc-tests}
+
+If there is a significant three-way interaction effect, you can
+decompose it into:
+
+\begin{itemize}
+\item
+  \emph{Simple two-way interaction}: run two-way interaction at each
+  level of third variable,
+\item
+  \emph{Simple simple main effect}: run one-way model at each level of
+  second variable, and/or
+\item
+  \emph{Simple simple pairwise comparisons}: run pairwise or other
+  post-hoc comparisons if necessary.
+\end{itemize}
+
+\subsubsection{Compute simple two-way
+interaction}\label{compute-simple-two-way-interaction}
+
+You are free to decide which two variables will form the simple two-way
+interactions and which variable will act as the third (moderator)
+variable. In the following R code, we have considered the simple two-way
+interaction of Referentiality*Gender Status at each level of Anaphor
+Type
+
+It is recommended to adjust the p-value for multiple testing (Bonferroni
+correction) by dividing the current \(\alpha\)-level you declare
+statistical significance at (i.e., p \textless{} 0.05) by the number of
+simple two-way interaction you are computing (i.e., 2). Thus two-way
+interaction as statistically significant when \(p < 0.025\) (i.e.,
+\(p < 0.05/2\)).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{prost\_2024\_combined }\OtherTok{\textless{}{-}}\NormalTok{ prost\_2024\_combined }\SpecialCharTok{|\textgreater{}} \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{|\textgreater{}} \FunctionTok{group\_by}\NormalTok{(Anaphor\_Type)}
+
+\FunctionTok{kable}\NormalTok{(two.way }\OtherTok{\textless{}{-}}\NormalTok{ prost\_2024\_combined }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{anova\_test}\NormalTok{(}\AttributeTok{dv =}\NormalTok{ diff\_score, }\AttributeTok{wid =}\NormalTok{ SubjID, }\AttributeTok{within =} \FunctionTok{c}\NormalTok{(Referentiality, Gender\_Status)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.2262}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.3452}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0476}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0476}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0833}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1071}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0714}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0714}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Anaphor\_Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+DFn
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+DFd
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+F
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+p\textless.05
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+ges
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Gendered Singular & Referentiality & 1 & 37 & 24.535 & 1.63e-05 & * &
+0.160 \\
+Gendered Singular & Gender\_Status & 1 & 37 & 2.082 & 1.57e-01 & &
+0.016 \\
+Gendered Singular & Referentiality:Gender\_Status & 1 & 37 & 5.367 &
+2.60e-02 & * & 0.028 \\
+NonGendered Plural & Referentiality & 1 & 37 & 5.378 & 2.60e-02 & * &
+0.024 \\
+NonGendered Plural & Gender\_Status & 1 & 37 & 0.594 & 4.46e-01 & &
+0.003 \\
+NonGendered Plural & Referentiality:Gender\_Status & 1 & 37 & 4.739 &
+3.60e-02 & * & 0.045 \\
+\end{longtable}
+
+Can also compute these using lmer
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(lme4)}
+\NormalTok{fitted.model}\FloatTok{.2}\NormalTok{a }\OtherTok{\textless{}{-}} \FunctionTok{lmer}\NormalTok{(diff\_score }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Referentiality }\SpecialCharTok{*}\NormalTok{ Gender\_Status  }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{SubjID), }\AttributeTok{data=}\FunctionTok{filter}\NormalTok{(prost\_2024\_combined,Anaphor\_Type }\SpecialCharTok{==} \StringTok{"Gendered Singular"}\NormalTok{ ))}
+\FunctionTok{kable}\NormalTok{(}\FunctionTok{Anova}\NormalTok{(fitted.model}\FloatTok{.2}\NormalTok{a))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lrrr@{}}
+\toprule\noalign{}
+& Chisq & Df & Pr(\textgreater Chisq) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Referentiality & 28.130117 & 1 & 0.0000001 \\
+Gender\_Status & 2.340409 & 1 & 0.1260565 \\
+Referentiality:Gender\_Status & 4.214542 & 1 & 0.0400789 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fitted.model}\FloatTok{.2}\NormalTok{b }\OtherTok{\textless{}{-}} \FunctionTok{lmer}\NormalTok{(diff\_score }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Referentiality }\SpecialCharTok{*}\NormalTok{ Gender\_Status  }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{|}\NormalTok{SubjID), }\AttributeTok{data=}\FunctionTok{filter}\NormalTok{(prost\_2024\_combined,Anaphor\_Type }\SpecialCharTok{==} \StringTok{"NonGendered Plural"}\NormalTok{ ))}
+\FunctionTok{kable}\NormalTok{(}\FunctionTok{Anova}\NormalTok{(fitted.model}\FloatTok{.2}\NormalTok{b))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lrrr@{}}
+\toprule\noalign{}
+& Chisq & Df & Pr(\textgreater Chisq) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Referentiality & 3.595763 & 1 & 0.0579270 \\
+Gender\_Status & 0.516181 & 1 & 0.4724753 \\
+Referentiality:Gender\_Status & 6.933698 & 1 & 0.0084587 \\
+\end{longtable}
+
+\subsubsection{\texorpdfstring{1 Compute simple simple main effects
+using \texttt{anova\_test()} function in the \texttt{rstatix}
+package}{1 Compute simple simple main effects using anova\_test() function in the rstatix package}}\label{compute-simple-simple-main-effects-using-anova_test-function-in-the-rstatix-package}
+
+A statistically significant simple two-way interaction can be followed
+up with simple simple main effects.
+
+Group the data by Anaphor\_Type and Gender\_Status, and analyze the
+simple main effect of Referentiality. The Bonferroni adjustment will be
+considered leading to statistical significance being accepted at the p
+\textless{} 0.025 level (that is 0.05 divided by the number of tests
+(here 2).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Effect of Referentiality at each Anaphor\_Type X Gender\_Status cell}
+\FunctionTok{kable}\NormalTok{(ref.effect }\OtherTok{\textless{}{-}}\NormalTok{ prost\_2024\_combined }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(Anaphor\_Type, Gender\_Status) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{anova\_test}\NormalTok{(}\AttributeTok{dv =}\NormalTok{ diff\_score, }\AttributeTok{wid =}\NormalTok{ SubjID, }\AttributeTok{within =}\NormalTok{ Referentiality) )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.2262}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1786}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0476}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0476}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0833}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1071}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0714}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0714}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Anaphor\_Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Gender\_Status
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effect
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+DFn
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+DFd
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+F
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+p\textless.05
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+ges
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Gendered Singular & Gendered & Referentiality & 1 & 37 & 23.359 &
+2.36e-05 & * & 0.233 \\
+Gendered Singular & NonGendered & Referentiality & 1 & 37 & 6.833 &
+1.30e-02 & * & 0.082 \\
+NonGendered Plural & Gendered & Referentiality & 1 & 37 & 11.333 &
+2.00e-03 & * & 0.143 \\
+NonGendered Plural & NonGendered & Referentiality & 1 & 37 & 0.221 &
+6.41e-01 & & 0.003 \\
+\end{longtable}
+
+\subsubsection{\texorpdfstring{2 Compute simple simple main effects with
+Bonferroni adjustment using \texttt{pwc()} function in the
+\texttt{rstatix}}{2 Compute simple simple main effects with Bonferroni adjustment using pwc() function in the rstatix}}\label{compute-simple-simple-main-effects-with-bonferroni-adjustment-using-pwc-function-in-the-rstatix}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Pairwise comparisons}
+\NormalTok{pwc }\OtherTok{\textless{}{-}}\NormalTok{ prost\_2024\_combined }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(Anaphor\_Type, Gender\_Status) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{pairwise\_t\_test}\NormalTok{(diff\_score }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Referentiality, }\AttributeTok{paired =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{p.adjust.method =} \StringTok{"bonferroni"}\NormalTok{) }
+\FunctionTok{kable}\NormalTok{(pwc)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 22\tabcolsep) * \real{0.1557}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 22\tabcolsep) * \real{0.1148}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 22\tabcolsep) * \real{0.0902}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 22\tabcolsep) * \real{0.0984}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 22\tabcolsep) * \real{0.1230}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 22\tabcolsep) * \real{0.0246}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 22\tabcolsep) * \real{0.0246}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 22\tabcolsep) * \real{0.0902}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 22\tabcolsep) * \real{0.0246}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 22\tabcolsep) * \real{0.0738}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 22\tabcolsep) * \real{0.0738}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 22\tabcolsep) * \real{0.1066}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Anaphor\_Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Gender\_Status
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+.y.
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+group1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+group2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+n1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+n2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p.adj
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+p.adj.signif
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Gendered Singular & Gendered & diff\_score & Referential &
+NonReferential & 38 & 38 & -4.8331203 & 37 & 2.36e-05 & 2.36e-05 &
+**** \\
+Gendered Singular & NonGendered & diff\_score & Referential &
+NonReferential & 38 & 38 & -2.6140474 & 37 & 1.30e-02 & 1.30e-02 & * \\
+NonGendered Plural & Gendered & diff\_score & Referential &
+NonReferential & 38 & 38 & 3.3664471 & 37 & 2.00e-03 & 2.00e-03 & ** \\
+NonGendered Plural & NonGendered & diff\_score & Referential &
+NonReferential & 38 & 38 & -0.4705374 & 37 & 6.41e-01 & 6.41e-01 & ns \\
+\end{longtable}
+
+\subsubsection{\texorpdfstring{Compute simple simple main effects using
+\texttt{t.test()}
+function}{Compute simple simple main effects using t.test() function}}\label{compute-simple-simple-main-effects-using-t.test-function}
+
+Create 4 separate dataframes for each test in order to do paired test.
+Below I run an unpaired test after each paired test just to see what how
+different they are..
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{singular.gendered }\OtherTok{\textless{}{-}}\NormalTok{ prost\_2022\_singular }\SpecialCharTok{|\textgreater{}} \FunctionTok{filter}\NormalTok{(Gender\_Status }\SpecialCharTok{==} \StringTok{"Gendered"}\NormalTok{)}
+\NormalTok{singular.nongendered }\OtherTok{\textless{}{-}}\NormalTok{ prost\_2022\_singular }\SpecialCharTok{|\textgreater{}} \FunctionTok{filter}\NormalTok{(Gender\_Status }\SpecialCharTok{==} \StringTok{"NonGendered"}\NormalTok{)}
+\NormalTok{plural.gendered }\OtherTok{\textless{}{-}}\NormalTok{ prost\_2022\_plural }\SpecialCharTok{|\textgreater{}} \FunctionTok{filter}\NormalTok{(Gender\_Status }\SpecialCharTok{==} \StringTok{"Gendered"}\NormalTok{)}
+\NormalTok{plural.nongendered }\OtherTok{\textless{}{-}}\NormalTok{ prost\_2022\_plural }\SpecialCharTok{|\textgreater{}} \FunctionTok{filter}\NormalTok{(Gender\_Status }\SpecialCharTok{==} \StringTok{"NonGendered"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+``Some woman\ldots himself'' vs.~``Mary\ldots himself''
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pander}\NormalTok{(}\FunctionTok{t.test}\NormalTok{(singular.gendered}\SpecialCharTok{$}\NormalTok{diff\_score[singular.gendered}\SpecialCharTok{$}\NormalTok{Referentiality }\SpecialCharTok{==} \StringTok{"Referential"}\NormalTok{],}
+\NormalTok{              singular.gendered}\SpecialCharTok{$}\NormalTok{diff\_score[singular.gendered}\SpecialCharTok{$}\NormalTok{Referentiality }\SpecialCharTok{==} \StringTok{"NonReferential"}\NormalTok{], }
+              \AttributeTok{paired =} \ConstantTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2073}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0610}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2073}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3049}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2195}}@{}}
+\caption{Paired t-test:
+\texttt{singular.gendered\$diff\_score{[}singular.gendered\$Referentiality\ ==\ "Referential"{]}}
+and
+\texttt{singular.gendered\$diff\_score{[}singular.gendered\$Referentiality\ ==\ "NonReferential"{]}}}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+mean difference
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+mean difference
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+-4.833 & 37 & 2.36e-05 * * * & two.sided & -1.893 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pander}\NormalTok{(}\FunctionTok{t.test}\NormalTok{(diff\_score }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Referentiality,}
+              \FunctionTok{filter}\NormalTok{(prost\_2024\_combined, }
+\NormalTok{                     Anaphor\_Type }\SpecialCharTok{==} \StringTok{"Gendered Singular"} \SpecialCharTok{\&}\NormalTok{ Gender\_Status }\SpecialCharTok{==} \StringTok{"Gendered"}\NormalTok{ )))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2361}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1111}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3472}}@{}}
+\caption{Welch Two Sample t-test: \texttt{diff\_score} by
+\texttt{Referentiality} (continued below)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+-4.747 & 72.97 & 1.002e-05 * * * & two.sided \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3889}}
+  >{\centering\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4306}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+mean in group Referential
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+mean in group NonReferential
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+-0.4045 & 1.489 \\
+\end{longtable}
+
+``Someone\ldots himself'' vs.~``The participant\ldots himself''
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pander}\NormalTok{(}\FunctionTok{t.test}\NormalTok{(singular.nongendered}\SpecialCharTok{$}\NormalTok{diff\_score[singular.nongendered}\SpecialCharTok{$}\NormalTok{Referentiality }\SpecialCharTok{==} \StringTok{"Referential"}\NormalTok{],}
+\NormalTok{              singular.nongendered}\SpecialCharTok{$}\NormalTok{diff\_score[singular.nongendered}\SpecialCharTok{$}\NormalTok{Referentiality }\SpecialCharTok{==} \StringTok{"NonReferential"}\NormalTok{], }
+              \AttributeTok{paired =} \ConstantTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2208}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0649}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1558}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3247}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2338}}@{}}
+\caption{Paired t-test:
+\texttt{singular.nongendered\$diff\_score{[}singular.nongendered\$Referentiality\ ==\ "Referential"{]}}
+and
+\texttt{singular.nongendered\$diff\_score{[}singular.nongendered\$Referentiality\ ==\ "NonReferential"{]}}}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+mean difference
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+mean difference
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+-2.614 & 37 & 0.01286 * & two.sided & -0.8365 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pander}\NormalTok{ (}\FunctionTok{t.test}\NormalTok{(diff\_score }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Referentiality,}
+               \FunctionTok{filter}\NormalTok{(prost\_2024\_combined, }
+\NormalTok{                      Anaphor\_Type }\SpecialCharTok{==} \StringTok{"Gendered Singular"} \SpecialCharTok{\&}\NormalTok{ Gender\_Status }\SpecialCharTok{==} \StringTok{"NonGendered"}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2361}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1111}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1667}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3472}}@{}}
+\caption{Welch Two Sample t-test: \texttt{diff\_score} by
+\texttt{Referentiality} (continued below)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+-2.571 & 67.79 & 0.01233 * & two.sided \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3889}}
+  >{\centering\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4306}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+mean in group Referential
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+mean in group NonReferential
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+-0.2699 & 0.5666 \\
+\end{longtable}
+
+``Some woman\ldots themselves'' vs.~``Mary..themselves''
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pander}\NormalTok{(}\FunctionTok{t.test}\NormalTok{(plural.gendered}\SpecialCharTok{$}\NormalTok{diff\_score[plural.gendered}\SpecialCharTok{$}\NormalTok{Referentiality }\SpecialCharTok{==} \StringTok{"Referential"}\NormalTok{],}
+\NormalTok{              plural.gendered}\SpecialCharTok{$}\NormalTok{diff\_score[plural.gendered}\SpecialCharTok{$}\NormalTok{Referentiality }\SpecialCharTok{==} \StringTok{"NonReferential"}\NormalTok{], }
+              \AttributeTok{paired =} \ConstantTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2125}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0625}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1875}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3125}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2250}}@{}}
+\caption{Paired t-test:
+\texttt{plural.gendered\$diff\_score{[}plural.gendered\$Referentiality\ ==\ "Referential"{]}}
+and
+\texttt{plural.gendered\$diff\_score{[}plural.gendered\$Referentiality\ ==\ "NonReferential"{]}}}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+mean difference
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+mean difference
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+3.366 & 37 & 0.001787 * * & two.sided & 1.174 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pander}\NormalTok{(}\FunctionTok{t.test}\NormalTok{(diff\_score }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Referentiality,}
+              \FunctionTok{filter}\NormalTok{(prost\_2024\_combined,}
+\NormalTok{                     Anaphor\_Type }\SpecialCharTok{==} \StringTok{"NonGendered Plural"} \SpecialCharTok{\&}\NormalTok{ Gender\_Status }\SpecialCharTok{==} \StringTok{"Gendered"}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2361}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1111}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3472}}@{}}
+\caption{Welch Two Sample t-test: \texttt{diff\_score} by
+\texttt{Referentiality} (continued below)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+3.51 & 73.53 & 0.0007689 * * * & two.sided \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3889}}
+  >{\centering\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4306}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+mean in group Referential
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+mean in group NonReferential
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0.9267 & -0.2474 \\
+\end{longtable}
+
+``Someone\ldots themselves'' vs.~``The participant\ldots themselves''
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pander}\NormalTok{(}\FunctionTok{t.test}\NormalTok{(plural.nongendered}\SpecialCharTok{$}\NormalTok{diff\_score[plural.gendered}\SpecialCharTok{$}\NormalTok{Referentiality }\SpecialCharTok{==} \StringTok{"Referential"}\NormalTok{],}
+\NormalTok{              plural.nongendered}\SpecialCharTok{$}\NormalTok{diff\_score[plural.gendered}\SpecialCharTok{$}\NormalTok{Referentiality }\SpecialCharTok{==} \StringTok{"NonReferential"}\NormalTok{], }
+              \AttributeTok{paired =} \ConstantTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2267}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.0667}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1333}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3333}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2400}}@{}}
+\caption{Paired t-test:
+\texttt{plural.nongendered\$diff\_score{[}plural.gendered\$Referentiality\ ==\ "Referential"{]}}
+and
+\texttt{plural.nongendered\$diff\_score{[}plural.gendered\$Referentiality\ ==\ "NonReferential"{]}}}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+mean difference
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+mean difference
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+-0.4705 & 37 & 0.6407 & two.sided & -0.191 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pander}\NormalTok{(}\FunctionTok{t.test}\NormalTok{(diff\_score }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Referentiality,}
+              \FunctionTok{filter}\NormalTok{(prost\_2024\_combined,}
+\NormalTok{                     Anaphor\_Type }\SpecialCharTok{==} \StringTok{"NonGendered Plural"} \SpecialCharTok{\&}\NormalTok{ Gender\_Status }\SpecialCharTok{==} \StringTok{"NonGendered"}\NormalTok{ )))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2361}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1111}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1389}}
+  >{\centering\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3472}}@{}}
+\caption{Welch Two Sample t-test: \texttt{diff\_score} by
+\texttt{Referentiality} (continued below)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Test statistic
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+df
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+P value
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Alternative hypothesis
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+-0.482 & 73.91 & 0.6312 & two.sided \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3889}}
+  >{\centering\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4306}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+mean in group Referential
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+mean in group NonReferential
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0.0579 & 0.2489 \\
+\end{longtable}
+
+\subsubsection{Condition Means for Analysis
+1}\label{condition-means-for-analysis-1}
+
+Significant Effects: \textbf{Referentiality; Referentiality x Anaphor
+Type; Referentiality X Gender Status X Anaphor Type}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{kable}\NormalTok{(singular\_means1 }\OtherTok{\textless{}{-}}\NormalTok{ prost\_2024\_combined }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{group\_by}\NormalTok{(Referentiality) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{Mean =} \FunctionTok{mean}\NormalTok{(diff\_score), }
+            \AttributeTok{SE =} \FunctionTok{sem}\NormalTok{(diff\_score), }
+            \AttributeTok{SD =} \FunctionTok{sd}\NormalTok{(diff\_score), }
+            \AttributeTok{Max =} \FunctionTok{max}\NormalTok{(diff\_score), }
+            \AttributeTok{Min =} \FunctionTok{min}\NormalTok{(diff\_score)), }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lrrrrr@{}}
+\toprule\noalign{}
+Referentiality & Mean & SE & SD & Max & Min \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Referential & 0.08 & 0.13 & 1.59 & 4.45 & -4.41 \\
+NonReferential & 0.51 & 0.14 & 1.76 & 6.52 & -4.29 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{kable}\NormalTok{(singular\_means1 }\OtherTok{\textless{}{-}}\NormalTok{ prost\_2024\_combined }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{group\_by}\NormalTok{(Referentiality, Anaphor\_Type) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{Mean =} \FunctionTok{mean}\NormalTok{(diff\_score), }
+            \AttributeTok{SE =} \FunctionTok{sem}\NormalTok{(diff\_score), }
+            \AttributeTok{SD =} \FunctionTok{sd}\NormalTok{(diff\_score), }
+            \AttributeTok{Max =} \FunctionTok{max}\NormalTok{(diff\_score), }
+            \AttributeTok{Min =} \FunctionTok{min}\NormalTok{(diff\_score)), }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}llrrrrr@{}}
+\toprule\noalign{}
+Referentiality & Anaphor\_Type & Mean & SE & SD & Max & Min \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Referential & Gendered Singular & -0.34 & 0.16 & 1.42 & 4.15 & -4.41 \\
+Referential & NonGendered Plural & 0.49 & 0.19 & 1.66 & 4.45 & -4.03 \\
+NonReferential & Gendered Singular & 1.03 & 0.20 & 1.78 & 6.52 &
+-3.33 \\
+NonReferential & NonGendered Plural & 0.00 & 0.18 & 1.60 & 3.52 &
+-4.29 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{kable}\NormalTok{(singular\_means2 }\OtherTok{\textless{}{-}}\NormalTok{ prost\_2024\_combined }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{group\_by}\NormalTok{( Anaphor\_Type, Gender\_Status,  Referentiality) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{Mean =} \FunctionTok{mean}\NormalTok{(diff\_score), }
+            \AttributeTok{SE =} \FunctionTok{sem}\NormalTok{(diff\_score), }
+            \AttributeTok{SD =} \FunctionTok{sd}\NormalTok{(diff\_score), }
+            \AttributeTok{Max =} \FunctionTok{max}\NormalTok{(diff\_score), }
+            \AttributeTok{Min =} \FunctionTok{min}\NormalTok{(diff\_score)), }\AttributeTok{digits =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.2533}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1867}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.2000}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0800}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0667}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0667}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0667}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0800}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Anaphor\_Type
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Gender\_Status
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Referentiality
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Mean
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+SE
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+SD
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Max
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Min
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Gendered Singular & Gendered & Referential & -0.40 & 0.26 & 1.63 & 4.15
+& -4.41 \\
+Gendered Singular & Gendered & NonReferential & 1.49 & 0.30 & 1.84 &
+6.52 & -1.66 \\
+Gendered Singular & NonGendered & Referential & -0.27 & 0.19 & 1.18 &
+2.54 & -2.50 \\
+Gendered Singular & NonGendered & NonReferential & 0.57 & 0.26 & 1.62 &
+4.02 & -3.33 \\
+NonGendered Plural & Gendered & Referential & 0.93 & 0.25 & 1.52 & 4.45
+& -2.35 \\
+NonGendered Plural & Gendered & NonReferential & -0.25 & 0.23 & 1.40 &
+3.52 & -2.77 \\
+NonGendered Plural & NonGendered & Referential & 0.06 & 0.28 & 1.70 &
+3.52 & -4.03 \\
+NonGendered Plural & NonGendered & NonReferential & 0.25 & 0.29 & 1.76 &
+3.18 & -4.29 \\
+\end{longtable}
+
+\section{Visualization: Box plots with
+p-values}\label{visualization-box-plots-with-p-values}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{prost\_2024\_combined }\OtherTok{\textless{}{-}} \FunctionTok{ungroup}\NormalTok{(prost\_2024\_combined)}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(ggsci)}
+\FunctionTok{library}\NormalTok{(ggpubr)}
+
+\NormalTok{bxp2 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ prost\_2024\_combined,}
+       \AttributeTok{mapping =} \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Gender\_Status, }\AttributeTok{y =}\NormalTok{ diff\_score, }\AttributeTok{colour =}\NormalTok{ Referentiality)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\AttributeTok{staplewidth =}\NormalTok{ .}\DecValTok{25}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Anaphor\_Type, }\AttributeTok{ncol =} \DecValTok{2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{y =} \StringTok{"Voltage difference (critical {-} baseline) in microvolts"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Gender Status"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_classic}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_aaas}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_aaas}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.3}\NormalTok{)}
+
+
+\NormalTok{pwc }\OtherTok{\textless{}{-}}\NormalTok{ pwc }\SpecialCharTok{|\textgreater{}} \FunctionTok{add\_xy\_position}\NormalTok{(}\AttributeTok{x =} \StringTok{"Gender\_Status"}\NormalTok{)}
+\NormalTok{pwc.filtered }\OtherTok{\textless{}{-}}\NormalTok{ pwc }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(Anaphor\_Type }\SpecialCharTok{==} \StringTok{"Gendered Singular"}\NormalTok{, Gender\_Status }\SpecialCharTok{==} \StringTok{"Gendered"}\NormalTok{)}
+\NormalTok{bxp2 }\SpecialCharTok{+} 
+  \FunctionTok{stat\_pvalue\_manual}\NormalTok{(pwc, }\AttributeTok{tip.length =} \DecValTok{0}\NormalTok{, }\AttributeTok{hide.ns =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{subtitle =} \FunctionTok{get\_test\_label}\NormalTok{(fitted.model}\FloatTok{.0}\NormalTok{, }\AttributeTok{detailed =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{caption =} \FunctionTok{get\_pwc\_label}\NormalTok{(pwc)) }\SpecialCharTok{+}
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Antecedent Gender Status"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{colour=}\StringTok{"Antecedent Referentiality"}\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prost_202309_p600_combined_files/figure-latex/unnamed-chunk-19-1.pdf}
+
+\section{Visualization: Bar chart}\label{visualization-bar-chart}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{summary\_data\_2 }\OtherTok{\textless{}{-}}\NormalTok{ prost\_2024\_combined }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(Anaphor\_Type,Gender\_Status, Referentiality) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{mean =} \FunctionTok{mean}\NormalTok{(diff\_score), }\AttributeTok{se =} \FunctionTok{sem}\NormalTok{(diff\_score))}\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{lwr =}\NormalTok{ mean }\SpecialCharTok{{-}}\NormalTok{ (}\FloatTok{1.96}\SpecialCharTok{*}\NormalTok{se), }\AttributeTok{upr =}\NormalTok{ mean }\SpecialCharTok{+}\NormalTok{ (}\FloatTok{1.96}\SpecialCharTok{*}\NormalTok{se))}
+\NormalTok{summary\_data\_2}\SpecialCharTok{$}\NormalTok{label }\OtherTok{=} \FunctionTok{c}\NormalTok{(}\StringTok{"John...herself"}\NormalTok{,}\StringTok{"some man...herself"}\NormalTok{,}\StringTok{"the participant...herself"}\NormalTok{, }\StringTok{"someone...herself"}\NormalTok{, }\StringTok{"John...themselves"}\NormalTok{, }\StringTok{"some man...themselves"}\NormalTok{, }\StringTok{"the participant...themselves"}\NormalTok{, }\StringTok{"someone...themselves"}\NormalTok{ )}
+
+\NormalTok{(plotA }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(summary\_data\_2, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Gender\_Status, }
+                         \AttributeTok{y =}\NormalTok{ mean,}
+                         \AttributeTok{ymin =}\NormalTok{ lwr,}
+                         \AttributeTok{ymax =}\NormalTok{ upr,}
+                         \AttributeTok{fill =}\NormalTok{ Referentiality,}
+                         \AttributeTok{colour =}\NormalTok{ Referentiality,}
+                         \AttributeTok{label =}\NormalTok{ label)) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{position=}\FunctionTok{position\_dodge}\NormalTok{(), }\AttributeTok{stat=}\StringTok{"identity"}\NormalTok{) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_errorbar}\NormalTok{(}\AttributeTok{width =}\NormalTok{ .}\DecValTok{15}\NormalTok{, }\AttributeTok{position =} \FunctionTok{position\_dodge}\NormalTok{(.}\DecValTok{9}\NormalTok{), }\AttributeTok{colour =} \StringTok{"black"}\NormalTok{)  }\SpecialCharTok{+}
+    \FunctionTok{geom\_label\_repel}\NormalTok{(}\AttributeTok{show.legend =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{cex =} \DecValTok{2}\NormalTok{, }\AttributeTok{colour =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{ylab}\NormalTok{(}\StringTok{"Voltage difference (critical {-} baseline) in microvolts"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{xlab}\NormalTok{(}\StringTok{"Antecedent Gender Status"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.text =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{size=}\DecValTok{10}\NormalTok{))}\SpecialCharTok{+} 
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.title =} \FunctionTok{element\_blank}\NormalTok{()) }\SpecialCharTok{+}
+    \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Anaphor\_Type, }\AttributeTok{ncol =} \DecValTok{2}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{scale\_color\_npg}\NormalTok{() }\SpecialCharTok{+}
+    \FunctionTok{scale\_fill\_npg}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.8}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prost_202309_p600_combined_files/figure-latex/unnamed-chunk-20-1.pdf}
+
+\end{document}

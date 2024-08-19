@@ -10,7 +10,7 @@ editor_options:
 
 ## Overview
 
-This document contains the code to reproduce the statistical analyses described in [Prasad and Morris (2019)](https://psyarxiv.com/hwzke). You can download the data and the original .Rmd file [here](https://osf.io/2vjyp/).
+This document contains the code to reproduce the statistical analyses described in [Prasad and Morris (2024)]
 
 This document has two sections:
 
@@ -50,168 +50,262 @@ Before we begin, let's set some general parameters for `ggplot2`. We will set a 
 theme_set(theme_classic() +  theme(legend.position = "bottom")) 
 ```
 
+## Load the data
 
 ```{r}
-prost_2022_singular <- read_csv("prost_2022_singular_n400_nref.csv")
-prost_2022_plural <- read_csv("prost_2022_plural_n400_nref.csv")
+prost_2024_singular <- read_csv("prost_2022_singular_n400_nref.csv")
+prost_2024_plural <- read_csv("prost_2022_plural_n400_nref.csv")
 ```
 
 Then we re-order factor levels for *Anteriority* & *Referentiality*
 
 ```{r}
-prost_2022_singular$Anteriority <- factor(prost_2022_singular$Anteriority, 
+prost_2024_singular$Anteriority <- factor(prost_2024_singular$Anteriority, 
                                             levels=c('Frontal',
                                                      'FrontoCentral', 
                                                      'Central', 
                                                      'CentroParietal', 
                                                      'Parietal'))
 
-prost_2022_singular$Referentiality <- factor(prost_2022_singular$Referentiality, 
+prost_2024_singular$Referentiality <- factor(prost_2024_singular$Referentiality, 
                                             levels=c('Referential',
                                                      'NonReferential'))
-levels(prost_2022_singular$Anteriority)
-levels(prost_2022_singular$Referentiality)
+levels(prost_2024_singular$Anteriority)
+levels(prost_2024_singular$Referentiality)
 
-prost_2022_plural$Anteriority <- factor(prost_2022_plural$Anteriority, 
+prost_2024_plural$Anteriority <- factor(prost_2024_plural$Anteriority, 
                                             levels=c('Frontal',
                                                      'FrontoCentral', 
                                                      'Central', 
                                                      'CentroParietal', 
                                                      'Parietal'))
 
-prost_2022_plural$Referentiality <- factor(prost_2022_plural$Referentiality, 
+prost_2024_plural$Referentiality <- factor(prost_2024_plural$Referentiality, 
                                             levels=c('Referential',
                                                      'NonReferential'))
-levels(prost_2022_plural$Anteriority)
-levels(prost_2022_plural$Referentiality)
+levels(prost_2024_plural$Anteriority)
+levels(prost_2024_plural$Referentiality)
 ```
-## Analysis 1: The N400 effect when antecedents are co-indexed with *himself* or *herself*
+
+## Check ANOVA assumptions
+
+- *No significant outliers in any cell of the design*. This can be checked by visualizing the data using box plot methods and by using the function `identify_outliers()` in the `rstatix` package.
+
+```{r}
+library(rstatix)
+kable(identify_outliers(prost_2024_singular, diff_score))
+```
+
+- *Normality*: the outcome (or dependent) variable should be approximately normally distributed in each cell of the design. This can be checked using the Shapiro-Wilk normality test `shapiro_test()`in the `rstatix` package.
+
+```{r}
+kable(shapiro_test(prost_2024_singular, diff_score))
+```
+
+- *Assumption of sphericity*: the variance of the differences between groups should be equal. This can be checked using the Mauchly’s test of sphericity, which is automatically reported when using the R function `anova_test()` in the `rstatix` package.
+
+## Analysis using `rstatix()`" The N400 effect when antecedents are co-indexed with *himself* or *herself*
+
+```{r}
+fitted.model.0 <- anova_test(data = prost_2024_singular, 
+                      dv = diff_score, 
+                      wid = SubjID, 
+                      within = c(Referentiality, Gender_Status, Anteriority),
+                      between = Group)
+kable(fitted.model.0)
+```
+
+## Analysis using `ezANOVA`: The N400 effect when antecedents are co-indexed with *himself* or *herself*
 
 ```{r echo=TRUE}
 
-ezANOVA(data = prost_2022_singular
+fitted.model.1 <- ezANOVA(data = prost_2024_singular
               , dv = diff_score
               , wid = SubjID
               , within = .(Referentiality, Gender_Status, Anteriority)
               , between = Group
               , type = 3
-              , return_aov = F
-              )
+              , return_aov = F)
+fitted.model.1
+```
+
+
+## Analysis using lmer
+
+From [Introduction to Regression Methods for Public Health Using R by Ramzi W. Nahhas](https://www.bookdown.org/rwnahhas/RMPH/mlr-distinctions.html#)
+Use `car::Anova(, type = 3)` to test whether all the adjusted regression coefficients associated with a single term in the model (e.g., a single predictor, a single interaction) are simultaneously zero. For binary categorical predictors, continuous predictors, and interactions between them, the `car::Anova()` output is redundant with the regression coefficient table output from summary() since each such term only has one corresponding regression coefficient. However, you must use `car::Anova()` to test the significance of a categorical predictor with more than two levels or of an interaction that involves a categorical predictor with more than two levels. `car::Anova()` carries out comparisons for each of a set of specific pairs of nested models – each comparison is between the full model and a reduced model with one predictor (or interaction) removed.
+
+```{r echo=TRUE, warning=FALSE, message=FALSE}
+library(lme4)
+library(car)
+fitted.model.2 <- lmer(diff_score ~ Referentiality * Gender_Status * Anteriority * Group + (1|SubjID), data=prost_2024_singular)
+kable(Anova(fitted.model.2, type = 3))
+```
+
+
+
+### Post-hoc tests : Group x Gender Status x Referentiality
+
+If there is a significant three-way interaction effect, you can decompose it into:
+
+- *Simple two-way interaction*: run two-way interaction at each level of third variable,
+
+- *Simple simple main effect*: run one-way model at each level of second variable, and
+
+- *Simple simple pairwise comparisons*: run pairwise or other post-hoc comparisons if necessary.
+
+### Compute simple two-way interaction
+
+You are free to decide which two variables will form the simple two-way interactions and which variable will act as the third (moderator) variable. In the following R code, we have considered the simple two-way interaction of Referentiality*Gender Status at each level of Anaphor Type
+
+It is recommended to adjust the p-value for multiple testing (Bonferroni correction) by dividing the current $\alpha$-level you declare statistical significance at (i.e., p < 0.05) by the number of simple two-way interaction you are computing (i.e., 2). Thus two-way interaction as statistically significant when $p < 0.025$ (i.e., $p < 0.05/2$). 
+
+
+```{r}
+binary <- filter(prost_2024_singular, Group == "Binary")
+nonbinary <- filter(prost_2024_singular, Group == "NonBinary")
+
+
+kable(two.way.binary <- binary |>
+  ezANOVA(dv = diff_score,
+          wid = SubjID,
+          within = c(Referentiality, Gender_Status),
+          within_full = c(Referentiality, Gender_Status, Anteriority),
+          type = 3,
+          return_aov = F))
+
+kable(two.way.nonbinary <- nonbinary |>
+  ezANOVA(dv = diff_score,
+          wid = SubjID,
+          within = c(Referentiality, Gender_Status),
+          within_full = c(Referentiality, Gender_Status, Anteriority),
+          type = 3,
+          return_aov = F))
+
+```
+
+
+### Compute simple simple main effects 
+
+A statistically significant simple two-way interaction can be followed up with simple simple main effects.
+
+Group the data by Group and Gender_Status, and analyze the simple main effect of Referentiality.
+
+#### Effect of Referentiality at each  Gender_Status cell for Binary Group
+```{r}
+
+kable(ref.effect <- binary |>
+  filter(Gender_Status == "Gendered") |>
+  ezANOVA(dv = diff_score,
+          wid = SubjID,
+          within = c(Referentiality),
+          within_full = c(Referentiality, Gender_Status, Anteriority),
+          type = 3,
+          return_aov = F))
+
+kable(ref.effect <- binary |>
+  filter(Gender_Status == "NonGendered") |>
+  ezANOVA(dv = diff_score,
+          wid = SubjID,
+          within = c(Referentiality),
+          within_full = c(Referentiality, Gender_Status, Anteriority),
+          type = 3,
+          return_aov = F))
 ```
 
 ### Condition Means for Analysis 1
 
 The N400 effect when antecedents are co-indexed with *himself* or *herself*.  
 
-Significant Effects: **Referentiality; Group X Anteriority; Group x Referentiality x Gender Status**
+Significant Effects: **Referentiality; Group X Anteriority; Group x Gender Status x Referentiality**
 
 ```{r}
 
-kable(singular_means1 <- prost_2022_singular |> 
-  group_by(Referentiality) |>
+kable(singular_means1 <- prost_2024_singular |> 
+  group_by(Group, Referentiality) |>
   summarise(Mean = mean(diff_score), 
             SE = sem(diff_score), 
             SD = sd(diff_score), 
             Max = max(diff_score), 
             Min = min(diff_score)), digits = 2)
 
-kable(singular_means2 <- prost_2022_singular |> 
+kable(singular_means2 <- prost_2024_singular |> 
+  filter(Group == "Binary") |>     
+  group_by(Group, Gender_Status, Referentiality) |>
+  summarise(Mean = mean(diff_score), 
+            SE = sem(diff_score), 
+            SD = sd(diff_score), 
+            Max = max(diff_score), 
+            Min = min(diff_score)), digits = 2)
+
+kable(singular_means2 <- prost_2024_singular |> 
   group_by(Group, Anteriority) |>
   summarise(Mean = mean(diff_score), 
             SE = sem(diff_score), 
             SD = sd(diff_score), 
             Max = max(diff_score), 
             Min = min(diff_score)), digits = 2)
-
-kable(singular_means2 <- prost_2022_singular |> 
-  group_by(Group, Referentiality,Gender_Status) |>
-  summarise(Mean = mean(diff_score), 
-            SE = sem(diff_score), 
-            SD = sd(diff_score), 
-            Max = max(diff_score), 
-            Min = min(diff_score)), digits = 2)
-
 ```
 
-### Post-hoc tests for Analysis 1: Group x Gender Status x Referentiality
 
-The following chunk runs post-hoc tests for the 3-way ***"Group x Gender Status x Referentiality"*** Interaction
-
-#### Binary Group. 
-
-These are the post-hoc tests for the *binary* group.
+### Compute simple simple main effects with Bonferroni adjustment using `pwc()` function in the `rstatix`
 
 ```{r}
-binary <- filter(prost_2022_singular, Group == "Binary")
+# Pairwise comparisons
+pwc <- binary |>
+  group_by(Gender_Status) |>
+  pairwise_t_test(diff_score ~ Referentiality, paired = TRUE, p.adjust.method = "bonferroni") |>
+  select(-df, -statistic) # Remove details
+kable(pwc)
 
 ```
 
+# Visualization: Box plots with p-values BINARY
 
-"*Some woman...himself*" vs. "*Mary...himself*"  Binary
-
-```{r echo=TRUE}
-pander(t.test(diff_score ~ Referentiality
-       , filter(binary, (Gender_Status == "Gendered"))
-       , paired=TRUE))
-```
-
- "*Someone...himself*" vs. "*The participant...himself*" Binary
-
-```{r echo=TRUE}
-pander(t.test(diff_score ~ Referentiality
-       , filter(binary, (Gender_Status == "NonGendered"))
-       , paired=TRUE))
-```
-
-"*The participant...himself*" vs. "*Mary...himself*"  Binary
-
-```{r echo=TRUE}
-pander(t.test(diff_score ~ Gender_Status
-       , filter(binary, (Referentiality == "Referential"))
-       , paired=TRUE))
-```
-
-"*Someone...himself*" vs. "*Some woman...himself*"  Binary
-
-```{r echo=TRUE}
-pander(t.test(diff_score ~ Gender_Status
-       , filter(binary, (Referentiality == "NonReferential"))
-       , paired=TRUE))
-```
-
-"*Someone...himself*" vs. "*Mary...himself*"  Binary
-
-```{r echo=TRUE}
-mary_someone <- filter(binary, (Referentiality == "Referential" & Gender_Status == "Gendered") | (Referentiality == "NonReferential" & Gender_Status == "NonGendered"))
-
-pander(t.test(diff_score ~ Gender_Status, mary_someone, paired=TRUE))
-```
-
- "*Some woman...himself*" vs. "*the participant...himself*"  Binary
 ```{r}
-somewoman_theparticipant <-  filter(binary, (Referentiality == "NonReferential" & Gender_Status == "Gendered") | (Referentiality == "Referential" & Gender_Status == "NonGendered"))
 
-pander(t.test(diff_score ~ Gender_Status, somewoman_theparticipant, paired=TRUE))
+library(ggplot2)
+library(ggsci)
+library(ggpubr)
+
+
+bxp <- binary |>
+  ggplot(mapping = aes(x = Gender_Status, y = diff_score, colour = Referentiality)) +
+  geom_boxplot(staplewidth = .25) +
+  labs(y = "Voltage difference (critical - baseline) in microvolts", x = "Gender Status") +
+  theme_classic() +
+  scale_color_aaas() +
+  scale_fill_aaas(alpha = 0.3)
+
+
+pwc <- pwc |> add_xy_position(x = "Gender_Status")
+pwc.filtered <- pwc |> 
+  filter(Gender_Status == "Gendered")
+bxp + 
+  stat_pvalue_manual(pwc, tip.length = 0, hide.ns = TRUE) +
+  labs(subtitle = get_test_label(fitted.model.0, detailed = TRUE, correction = "none", row = 11), caption = get_pwc_label(pwc)) +
+  xlab("Antecedent Gender Status") +
+  labs(colour="Antecedent Referentiality" )
 ```
 
 
-##### Interaction Plots: Group x Gender Status x Referentiality Interaction: Binary
+## Interaction Plots: Group x Gender Status x Referentiality Interaction: Binary
 &nbsp;
 
 ```{r}
-summary_data_1b <- filter(prost_2022_singular, Group == "Binary") |> 
+summary_data_1b <- filter(prost_2024_singular, Group == "Binary") |> 
   group_by(Gender_Status, Referentiality) |>
   summarise(mean = mean(diff_score), se = sem(diff_score))|> 
   mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
 summary_data_1b$label = c("Mary","some woman", "the participant", "someone")
 
 
-ggplot(summary_data_1b, aes(x = Referentiality, 
+ggplot(summary_data_1b, aes(x = Gender_Status, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
-                         fill = Gender_Status, 
-                         group = Gender_Status,
+                         fill = Referentiality, 
+                         group = Referentiality,
                          label = label)) + 
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
@@ -221,104 +315,61 @@ ggplot(summary_data_1b, aes(x = Referentiality,
   #scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
 
-&nbsp;
+# Visualization: Box plots with p-values NONBINARY
+
+### Compute simple simple main effects with Bonferroni adjustment using `pwc()` function in the `rstatix`
 
 ```{r}
-
-ggplot(summary_data_1b, aes(x = Referentiality, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         colour = Gender_Status, 
-                         linetype= Gender_Status, 
-                         group = Gender_Status,
-                         label = label)) + 
-  geom_point() + 
-  geom_line() +
-  geom_errorbar(width = .2, position = position_dodge(.025))  +
-  geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_npg() + ylab("Voltage in microvolts")
-  #scale_fill_manual(values=c("cadetblue", "lightpink1"))
+# Pairwise comparisons
+pwc2 <- nonbinary |>
+  group_by(Gender_Status) |>
+  pairwise_t_test(diff_score ~ Referentiality, paired = TRUE, p.adjust.method = "bonferroni") 
+kable(pwc2)
 ```
-
-
-#### NonBinary Group. 
-
-These are the post-hoc tests for the *NonBinary* group.
 
 ```{r}
-nonbinary <- filter(prost_2022_singular, Group == "NonBinary")
+library(ggplot2)
+library(ggsci)
+library(ggpubr)
+
+bxp2 <- nonbinary |>
+  ggplot(mapping = aes(x = Gender_Status, y = diff_score, colour = Referentiality)) +
+  geom_boxplot(staplewidth = .25) +
+  labs(y = "Voltage difference (critical - baseline) in microvolts", x = "Gender Status") +
+  theme_classic() +
+  scale_color_aaas() +
+  scale_fill_aaas(alpha = 0.3)
+
+
+pwc2 <- pwc2 |> add_xy_position(x = "Gender_Status")
+pwc2.filtered <- pwc2 |> 
+  filter(Gender_Status == "Gendered")
+bxp2 + 
+  stat_pvalue_manual(pwc2, tip.length = 0, hide.ns = TRUE) +
+  labs(subtitle = get_test_label(fitted.model.0, detailed = TRUE, correction = "none", row = 11), caption = get_pwc_label(pwc2)) +
+  xlab("Antecedent Gender Status") +
+  labs(colour="Antecedent Referentiality" )
 ```
 
 
- "*Some woman...himself*" vs. "*Mary...himself*" NonBinary
-
-```{r echo=TRUE}
-
-pander(t.test(diff_score ~ Referentiality
-       ,filter(prost_2022_singular, (Gender_Status == "Gendered" & Group == "NonBinary"))
-       ,paired=TRUE))
-```
-
-"*Someone...himself*" vs. "*The participant...himself*" NonBinary
-
-```{r  echo=TRUE}
-
-pander(t.test(diff_score ~ Referentiality
-       , filter(prost_2022_singular, (Gender_Status == "NonGendered" & Group == "NonBinary"))
-       , paired=TRUE))
-```
-
- "*The participant...himself*" vs. "*Mary...himself*" NonBinary
-
-```{r  echo=TRUE}
-pander(t.test(diff_score ~ Gender_Status
-       , filter(prost_2022_singular, (Referentiality == "Referential" & Group == "NonBinary"))
-       , paired=TRUE))
-```
-
-"*Someone...himself*" vs. "*Some woman...himself*"  NonBinary
-
-```{r  echo=TRUE}
-
-pander(t.test(diff_score ~ Gender_Status
-       , filter(prost_2022_singular, (Referentiality == "NonReferential" & Group == "NonBinary"))
-       , paired=TRUE))
-```
-
-
-"*Someone...himself*" vs. "*Mary...himself*"  NonBinary
-
-```{r echo=TRUE}
-mary_someone <- filter(nonbinary, (Referentiality == "Referential" & Gender_Status == "Gendered") | (Referentiality == "NonReferential" & Gender_Status == "NonGendered"))
-
-pander(t.test(diff_score ~ Gender_Status, mary_someone, paired=TRUE))
-```
-
- "*Some woman...himself*" vs. "*the participant...himself*"  NonBinary
-```{r}
-somewoman_theparticipant <-  filter(nonbinary, (Referentiality == "NonReferential" & Gender_Status == "Gendered") | (Referentiality == "Referential" & Gender_Status == "NonGendered"))
-
-pander(t.test(diff_score ~ Gender_Status, somewoman_theparticipant, paired=TRUE))
-```
-##### Interaction Plots: Group x Gender Status x Referentiality NonBinary
+## Interaction Plots: Group x Gender Status x Referentiality NonBinary
 
 &nbsp;
 
 ```{r}
-summary_data_1nb <- filter(prost_2022_singular, Group == "NonBinary") |> 
+summary_data_1nb <- filter(prost_2024_singular, Group == "NonBinary") |> 
   group_by(Gender_Status, Referentiality) |>
   summarise(mean = mean(diff_score), se = sem(diff_score))|> 
   mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
 summary_data_1nb$label = c("Mary","some woman", "the participant", "someone")
 
 
-ggplot(summary_data_1nb, aes(x = Referentiality, 
+ggplot(summary_data_1nb, aes(x = Gender_Status, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
-                         fill = Gender_Status, 
-                         group = Gender_Status,
+                         fill = Referentiality, 
+                         group = Referentiality,
                          label = label)) + 
   geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
   geom_errorbar(width = .2, position = position_dodge(.9))  +
@@ -329,28 +380,9 @@ ggplot(summary_data_1nb, aes(x = Referentiality,
 
 ```
 
-&nbsp;
-
-```{r}
-
-ggplot(summary_data_1nb, aes(x = Gender_Status, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         colour = Referentiality, 
-                         linetype= Referentiality, 
-                         group = Referentiality,
-                         label = label)) + 
-  geom_point() + 
-  geom_line() +
-  geom_errorbar(width = .2, position = position_dodge(.025)) +
-  geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_npg() + ylab("Voltage in microvolts")
-  #scale_color_manual(values=wes_palette(n=3, name="Royal1"))
-```
 
 
-### Post-hoc tests for Analysis 1: Group x Anteriority
+# Post-hoc tests for Analysis 1: GROUP x ANTERIORITY interaction
 
 The following chunk runs post-hoc tests for the 2-way ***"Group x Anteriority"*** Interaction
 
@@ -358,42 +390,71 @@ The following chunk runs post-hoc tests for the 2-way ***"Group x Anteriority"**
 # Binary vs Non-Binary Frontal
 
 pander(t.test(diff_score ~ Group
-       ,dplyr::filter(prost_2022_singular, (Anteriority == "Frontal"))
-       ,paired=FALSE))
+       ,dplyr::filter(prost_2024_singular, (Anteriority == "Frontal"))))
 
-# Binary vs Non-Binary FrontoCentral
+# Binary vs Non-Binary Fronto-Central
 
 pander(t.test(diff_score ~ Group
-       ,dplyr::filter(prost_2022_singular, (Anteriority == "FrontoCentral"))
-       ,paired=FALSE))
+       ,dplyr::filter(prost_2024_singular, (Anteriority == "FrontoCentral"))))
 
 # Binary vs Non-Binary Central
 
 pander(t.test(diff_score ~ Group
-       ,dplyr::filter(prost_2022_singular, (Anteriority == "Central"))
-       ,paired=FALSE))
+       ,dplyr::filter(prost_2024_singular, (Anteriority == "Central"))))
 
-# Binary vs Non-Binary CentroParietal
+# Binary vs Non-Binary Centro-Parietal
 
 pander(t.test(diff_score ~ Group
-       ,dplyr::filter(prost_2022_singular, (Anteriority == "CentroParietal"))
-       ,paired=FALSE))
+       ,dplyr::filter(prost_2024_singular, (Anteriority == "CentroParietal"))))
 
 # Binary vs Non-Binary Parietal
 
 pander(t.test(diff_score ~ Group
-       ,dplyr::filter(prost_2022_singular, (Anteriority == "Parietal"))
-       ,paired=FALSE))
+       ,dplyr::filter(prost_2024_singular, (Anteriority == "Parietal"))))
 ```
 
+
+# Visualization: Box plots with p-values 
+
+### Compute simple simple main effects with Bonferroni adjustment using `pwc()` function in the `rstatix`
+
+```{r}
+# Pairwise comparisons
+pwc3 <- prost_2024_singular |>
+  group_by(Anteriority) |>
+  pairwise_t_test(diff_score ~ Group, p.adjust.method = "bonferroni") 
+kable(pwc3)
+
+```
+
+```{r}
+library(ggplot2)
+library(ggsci)
+library(ggpubr)
+
+bxp3 <- prost_2024_singular |>
+  ggplot(mapping = aes(x = Anteriority, y = diff_score, colour = Group)) +
+  geom_boxplot(staplewidth = .25) +
+  labs(y = "Voltage difference (critical - baseline) in microvolts", x = "Anteriority") +
+  theme_classic() +
+  scale_color_aaas() +
+  scale_fill_aaas(alpha = 0.3)
+
+
+pwc3 <- pwc3 |> add_xy_position(x = "Anteriority")
+bxp3 + 
+  stat_pvalue_manual(pwc3, tip.length = 0, hide.ns = TRUE) +
+  labs(subtitle = get_test_label(fitted.model.0, detailed = TRUE, correction = "none", row = 7), caption = get_pwc_label(pwc3)) +
+  xlab("Anteriority") +
+  labs(colour="Group" )
+```
 
 ##### Interaction Plot: Group x Anteriority
 
 &nbsp;
 
-   
 ```{r}
-summary_data_3 <- prost_2022_singular |> 
+summary_data_3 <- prost_2024_singular |> 
   group_by(Group, Anteriority) |>
   summarise(mean = mean(diff_score), se = sem(diff_score))|> 
   mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
@@ -414,138 +475,24 @@ ggplot(summary_data_3, aes(x = Anteriority,
 ```
 
 
-
-&nbsp;
-
-&nbsp;
-
-&nbsp;
-
-
-
-## Analysis 2: The N400 effect when antecedents are co-indexed with *themselves*
-
-
-```{r echo=TRUE}
-
-ezANOVA(data = prost_2022_plural
-              , dv = diff_score
-              , wid = SubjID
-              , within = .(Referentiality, Gender_Status, Anteriority)
-              , between = Group
-              , type = 3
-              , return_aov = F
-              )
-
-```
-
-#### Interaction Plots for Analysis 2  Gender Status by Referentiality Interaction 
-
-&nbsp;
-
-##### Binary Group
-
-&nbsp;
-
 ```{r}
-summary_data <- filter(prost_2022_plural, Group == "Binary") |> 
-  group_by(Gender_Status, Referentiality) |>
+summary_data_3 <- prost_2024_singular |> 
+  group_by(Group, Anteriority) |>
   summarise(mean = mean(diff_score), se = sem(diff_score))|> 
   mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
-summary_data$label = c("Mary","some woman", "the participant", "someone")
 
-
-ggplot(summary_data, aes(x = Gender_Status, 
+ggplot(summary_data_3, aes(x = Anteriority, 
                          y = mean,
                          ymin = lwr,
                          ymax = upr,
-                         fill = Referentiality, 
-                         group = Referentiality,
-                         label = label)) + 
-  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
-  geom_errorbar(width = .2, position = position_dodge(.9))  +
-  geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_npg() + ylab("Voltage in microvolts") +
-  ggtitle("Gender Status x Referentiality Interaction: Binary")
- # scale_fill_manual(values=c("cadetblue", "lightpink1"))
-```
-
-&nbsp;
-
-```{r}
-summary_data <- filter(prost_2022_plural, Group == "Binary") |> 
-  group_by(Gender_Status, Referentiality) |>
-  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
-  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
-summary_data$label = c("Mary","some woman", "the participant", "someone")
-
-
-ggplot(summary_data, aes(x = Gender_Status, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         colour = Referentiality, 
-                         linetype= Referentiality, 
-                         group = Referentiality,
-                         label = label)) + 
-  geom_point() + 
-  geom_line() +
-  geom_errorbar(width = .2, position = position_dodge(.025))  +
-  geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_npg() + ylab("Voltage in microvolts") 
-# scale_fill_manual(values=c("cadetblue", "lightpink1"))
-```
-
-
-##### NonBinary Group.  
-
-&nbsp;
-
-```{r}
-summary_data <- filter(prost_2022_plural, Group == "NonBinary") |> 
-  group_by(Gender_Status, Referentiality) |>
-  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
-  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
-summary_data$label = c("Mary","some woman", "the participant", "someone")
-
-
-ggplot(summary_data, aes(x = Gender_Status, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         fill = Referentiality, 
-                         group = Referentiality,
-                         label = label)) + 
-  geom_bar(position=position_dodge(), stat="identity", colour = "black") + 
-  geom_errorbar(width = .2, position = position_dodge(.9))  +
-  geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_npg() + ylab("Voltage in microvolts")+
-  ggtitle("Gender Status x Referentiality Interaction: NonBinary")
+                         fill = Group,
+                         colour = Group,
+                         group = Group)) + 
+  geom_bar(position=position_dodge(), stat="identity") + 
+  geom_errorbar(width = .2, colour = "grey40", position = position_dodge(.9))  +
+  scale_fill_npg(alpha = .9) + ylab("Voltage in microvolts") +
+  ggtitle("Voltage Differences between groups as a function of Anteriority")
   #scale_fill_manual(values=c("cadetblue", "lightpink1"))
 ```
-&nbsp;
 
-```{r}
-summary_data <- filter(prost_2022_plural, Group == "NonBinary") |> 
-  group_by(Gender_Status, Referentiality) |>
-  summarise(mean = mean(diff_score), se = sem(diff_score))|> 
-  mutate(lwr = mean - (1.96*se), upr = mean + (1.96*se))
-summary_data$label = c("Mary","some woman", "the participant", "someone")
-
-
-ggplot(summary_data, aes(x = Gender_Status, 
-                         y = mean,
-                         ymin = lwr,
-                         ymax = upr,
-                         colour = Referentiality, 
-                         linetype= Referentiality, 
-                         group = Referentiality,
-                         label = label)) + 
-  geom_point() + 
-  geom_line() +
-  geom_errorbar(width = .2, position = position_dodge(.025)) +
-  geom_label_repel(show.legend = FALSE, cex = 2)+
-  scale_fill_npg() + ylab("Voltage in microvolts")
-  #scale_fill_manual(values=c("cadetblue", "lightpink1"))
-```
 
