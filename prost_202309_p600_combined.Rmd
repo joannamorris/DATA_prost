@@ -3,7 +3,6 @@ title: "PROST P600 combined groups analysis using lmer"
 author: "Joanna Morris"
 date: "`r Sys.Date()`"
 output: pdf_document
-fontsize: 10pt
 editor_options: 
   chunk_output_type: console
 ---
@@ -14,7 +13,7 @@ editor_options:
 This script, on the advice of reviewer 1, conducts an ANOVA examining the P600 PROST data with Referentiality, Gender and Anaphor Type as within-subject variables. Gender Identity status will be examined as a post-hoc variable. 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(warning = FALSE, error = FALSE, message = FALSE, fig.dim = c(6, 6))
+knitr::opts_chunk$set(warning = FALSE, error = FALSE, message = FALSE, fig.dim = c(7, 5))
 library(knitr)
 library(ggplot2)
 library(ggrepel)
@@ -87,6 +86,7 @@ kable(shapiro_test(prost_2024_combined, diff_score))
 
 ## Analysis using `rstatix()`
 
+
 ```{r}
 fitted.model.0 <- anova_test(data = prost_2024_combined, 
                       dv = diff_score, 
@@ -155,7 +155,7 @@ fitted.model.2b <- lmer(diff_score ~ Referentiality * Gender_Status  + (1|SubjID
 kable(Anova(fitted.model.2b))
 ```
 
-### 1 Compute simple simple main effects using `anova_test()` function in the `rstatix` package
+### Compute simple simple main effects using `anova_test()` function in the `rstatix` package
 
 A statistically significant simple two-way interaction can be followed up with simple simple main effects.
 
@@ -168,16 +168,6 @@ kable(ref.effect <- prost_2024_combined |>
   anova_test(dv = diff_score, wid = SubjID, within = Referentiality) )
 ```
 
-### 2 Compute simple simple main effects with Bonferroni adjustment using `pwc()` function in the `rstatix`
-
-```{r}
-# Pairwise comparisons
-pwc <- prost_2024_combined |>
-  group_by(Anaphor_Type, Gender_Status) |>
-  pairwise_t_test(diff_score ~ Referentiality, paired = TRUE, p.adjust.method = "bonferroni") 
-kable(pwc)
-
-```
 
 ### Compute simple simple main effects using `t.test()` function 
 
@@ -201,14 +191,9 @@ pander(t.test(singular.gendered$diff_score[singular.gendered$Referentiality == "
 pander(t.test(diff_score ~ Referentiality,
               filter(prost_2024_combined, 
                      Anaphor_Type == "Gendered Singular" & Gender_Status == "Gendered" )))
-
-
-
 ```
 
 "Someone...himself" vs. "The participant...himself" 
-
-
 
 ```{r}
 pander(t.test(singular.nongendered$diff_score[singular.nongendered$Referentiality == "Referential"],
@@ -244,7 +229,7 @@ pander(t.test(diff_score ~ Referentiality,
                      Anaphor_Type == "NonGendered Plural" & Gender_Status == "NonGendered" )))
 ```
 
-### Condition Means for Analysis 1
+### Condition Means 
 
 Significant Effects: **Referentiality; Referentiality x Anaphor Type; Referentiality X Gender Status X Anaphor Type**
 
@@ -274,10 +259,23 @@ kable(singular_means2 <- prost_2024_combined |>
             SD = sd(diff_score), 
             Max = max(diff_score), 
             Min = min(diff_score)), digits = 2)
-
 ```
 
 # Visualization: Box plots with p-values
+
+## Compute simple simple main effects with Bonferroni adjustment using `pwc()` function in the `rstatix`
+
+
+```{r}
+# Pairwise comparisons
+pwc <- prost_2024_combined |>
+  group_by(Anaphor_Type, Gender_Status) |>
+  pairwise_t_test(diff_score ~ Referentiality, paired = TRUE, p.adjust.method = "bonferroni") |>
+  select(-p, -.y., -n2)
+kable(pwc)
+```
+
+\scriptsize
 
 ```{r}
 prost_2024_combined <- ungroup(prost_2024_combined)
