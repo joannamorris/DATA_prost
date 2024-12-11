@@ -49,8 +49,8 @@ theme_set(theme_classic()+
 ```{r}
 prost_2022_singular <- read_csv("prost_2022_singular_p600.csv")
 prost_2022_plural <- read_csv("prost_2022_plural_p600.csv")
-prost_2024_combined <- bind_rows(list("Gendered Singular" = prost_2022_singular, 
-                                     "NonGendered Plural" = prost_2022_plural), .id = "Anaphor_Type")
+prost_2024_combined <- bind_rows(list("Singular" = prost_2022_singular, 
+                                     "Plural" = prost_2022_plural), .id = "Anaphor_Type")
 ```
 
 ## Re-order factor levels for  *Referentiality* and *Anaphor_Type*
