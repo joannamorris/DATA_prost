@@ -60,8 +60,8 @@ prost_2024_combined$Referentiality <- factor(prost_2024_combined$Referentiality,
                                             levels=c('Referential',
                                                      'NonReferential'))
 prost_2024_combined$Anaphor_Type <- factor(prost_2024_combined$Anaphor_Type, 
-                                            levels=c('Gendered Singular',
-                                                     'NonGendered Plural'))
+                                            levels=c('Singular',
+                                                     'Plural'))
 levels(prost_2024_combined$Referentiality)
 levels(prost_2024_combined$Anaphor_Type)
 ```
@@ -148,10 +148,10 @@ Can also compute these using lmer
 
 ```{r}
 library(lme4)
-fitted.model.2a <- lmer(diff_score ~ Referentiality * Gender_Status  + (1|SubjID), data=filter(prost_2024_combined,Anaphor_Type == "Gendered Singular" ))
+fitted.model.2a <- lmer(diff_score ~ Referentiality * Gender_Status  + (1|SubjID), data=filter(prost_2024_combined,Anaphor_Type == "Singular" ))
 kable(Anova(fitted.model.2a))
 
-fitted.model.2b <- lmer(diff_score ~ Referentiality * Gender_Status  + (1|SubjID), data=filter(prost_2024_combined,Anaphor_Type == "NonGendered Plural" ))
+fitted.model.2b <- lmer(diff_score ~ Referentiality * Gender_Status  + (1|SubjID), data=filter(prost_2024_combined,Anaphor_Type == "Plural" ))
 kable(Anova(fitted.model.2b))
 ```
 
@@ -190,7 +190,7 @@ pander(t.test(singular.gendered$diff_score[singular.gendered$Referentiality == "
 
 pander(t.test(diff_score ~ Referentiality,
               filter(prost_2024_combined, 
-                     Anaphor_Type == "Gendered Singular" & Gender_Status == "Gendered" )))
+                     Anaphor_Type == "Singular" & Gender_Status == "Gendered" )))
 ```
 
 "Someone...himself" vs. "The participant...himself" 
@@ -202,7 +202,7 @@ pander(t.test(singular.nongendered$diff_score[singular.nongendered$Referentialit
 
 pander (t.test(diff_score ~ Referentiality,
                filter(prost_2024_combined, 
-                      Anaphor_Type == "Gendered Singular" & Gender_Status == "NonGendered")))
+                      Anaphor_Type == "Singular" & Gender_Status == "NonGendered")))
 ```
 
 "Some woman...themselves" vs. "Mary..themselves"  
@@ -214,7 +214,7 @@ pander(t.test(plural.gendered$diff_score[plural.gendered$Referentiality == "Refe
 
 pander(t.test(diff_score ~ Referentiality,
               filter(prost_2024_combined,
-                     Anaphor_Type == "NonGendered Plural" & Gender_Status == "Gendered")))
+                     Anaphor_Type == "Plural" & Gender_Status == "Gendered")))
 ```
 
 "Someone...themselves" vs. "The participant...themselves"  
@@ -226,7 +226,7 @@ pander(t.test(plural.nongendered$diff_score[plural.gendered$Referentiality == "R
 
 pander(t.test(diff_score ~ Referentiality,
               filter(prost_2024_combined,
-                     Anaphor_Type == "NonGendered Plural" & Gender_Status == "NonGendered" )))
+                     Anaphor_Type == "Plural" & Gender_Status == "NonGendered" )))
 ```
 
 ### Condition Means 
@@ -295,7 +295,7 @@ bxp2 <- ggplot(data = prost_2024_combined,
 
 pwc <- pwc |> add_xy_position(x = "Gender_Status")
 pwc.filtered <- pwc |> 
-  filter(Anaphor_Type == "Gendered Singular", Gender_Status == "Gendered")
+  filter(Anaphor_Type == "Singular", Gender_Status == "Gendered")
 bxp2 + 
   stat_pvalue_manual(pwc, tip.length = 0, hide.ns = TRUE) +
   labs(subtitle = get_test_label(fitted.model.0, detailed = TRUE), caption = get_pwc_label(pwc)) +

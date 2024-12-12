@@ -266,6 +266,25 @@ kable(singular_means2 <- prost_2024_singular |>
             SD = sd(diff_score), 
             Max = max(diff_score), 
             Min = min(diff_score)), digits = 2)
+kable(singular_means2_diff <- singular_means2 |>
+  select(-c(SD, Max, Min)) |> 
+  pivot_wider(names_from = Referentiality, values_from = c(Mean, SE)) %>%
+  mutate(mean_diff = `Mean_Referential` - `Mean_NonReferential`, 
+         avg_se = mean(`SE_Referential`,`SE_NonReferential`)))
+
+kable(singular_means3 <- prost_2024_singular |> 
+  filter(Group == "NonBinary") |>     
+  group_by(Group, Gender_Status, Referentiality) |>
+  summarise(Mean = mean(diff_score), 
+            SE = sem(diff_score), 
+            SD = sd(diff_score), 
+            Max = max(diff_score), 
+            Min = min(diff_score)), digits = 2) 
+kable(singular_means3_diff <- singular_means2 |>
+  select(-c(SD, Max, Min)) |> 
+  pivot_wider(names_from = Referentiality, values_from = c(Mean, SE)) %>%
+  mutate(mean_diff = `Mean_Referential` - `Mean_NonReferential`, 
+         avg_se = mean(`SE_Referential`,`SE_NonReferential`)))
 
 kable(singular_means2 <- prost_2024_singular |> 
   group_by(Group, Anteriority) |>
