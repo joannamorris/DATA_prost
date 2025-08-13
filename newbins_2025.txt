@@ -1,0 +1,34 @@
+b65 = b1 label NonGendered Bound variable ANT Masculine PRO
+b66 = b2 label NonGendered Bound variable ANT Feminine PRO
+b67 = b3 label NonGendered Bound variable sng ANT Gender-neutral PRO
+
+b68 = b11 label NonGendered Referential ANT Masculine PRO
+b69 = b12 label NonGendered Referential ANT Feminine PRO
+b70 = b13 label NonGendered  Bound variable sng ANT Gender-neutral PRO
+
+
+b71 = (b5 + b6)/2 label Gendered Bound variable ANT Gender-congruent PRO
+b72 = (b9 + b10)/2 label Gendered Bound variable ANT Gender-incongruent PRO
+b73 = b7 label Gendered Bound variable sng ANT Gender-neutral PRO
+
+b74 = (b15 + b16)/2 label Gendered Referential Gender-congruent PRO
+b75 = (b19 + b20)/2 label Gendered Referential Gender-incongruent PRO
+b76 = b17 label Gendered Referential sng Gender-neutral PRO
+
+b77 = b4 label NonGendered Bound variable Gender-neutral (plural antecedent)
+b78 = b14 label NonGendered Referential Gender-neutral (plural antecedent)
+b79 = b8 label Gendered Bound variable  Gender-neutral (plural antecedent)
+b80 = b18 label Gendered Referential Gender-neutral (plural antecedent)
+
+b81 = b67 - b65 label NonGendered Bound variable ANT Neutral - Masculine
+b82 = b66 - b65 label NonGendered Bound variable ANT Feminine - Masculine
+
+b83 = b70 - b68 label NonGendered Referential ANT Neutral - Masculine
+b84 = b69 - b68 label NonGendered Referential ANT Feminine - Masculine
+
+
+b85 = b73 - b71 label Gendered Bound variable ANT Neutral - Congruent
+b86 = b72 - b71 label Gendered Bound variable ANT Incongruent - Congruent
+
+b87 = b76 - b74 label Gendered Referential ANT Neutral - Congruent
+b88 = b75 - b74 label Gendered Referential ANT Incongruent - Congruent

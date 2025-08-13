@@ -1,0 +1,59 @@
+Rp: All critical items
+NRp: Distractors with pronouns embedded in idiomatic contexts
+Sr: Referential antecedents
+Gr: Non-referential antecedents
+Ag: Antecedents with ambiguous gender
+Ug: Antecedents with unambiguous gender
+he: he or himself
+she: she or herself
+they: they or themselves co-indexed with singular antecedents
+they_Pl: they or themselves co-indexed with plural antecedents
+
+
+
+Bin 1	Rp Bound variable NonGendered_he	.{11}
+
+Bin 2	Rp Bound variable NonGendered_she	.{12}
+
+Bin 3	Rp Bound variable NonGendered_they	.{13}
+
+Bin 4	Rp Bound variable NonGendered_theyPl	.{14}
+
+Bin 5	Rp Bound variable Gendered_he_congruent	.{21}
+
+Bin 6	Rp Bound variable Gendered_she_congruent	.{22}
+
+Bin 7	Rp Bound variable Gendered_they	.{23}
+
+Bin 8	Rp Bound variable Gendered_theyPl	.{24}
+
+Bin 9	Rp Bound variable Gendered_he_incongruent	.{25}
+
+Bin 10	Rp Bound variable Gendered_she_incongruent	.{26}
+
+Bin 11	Rp Referential NonGendered_he	.{31}
+
+Bin 12	Rp Referential NonGendered_she	.{32}
+
+Bin 13	Rp Referential NonGendered_they	.{33}
+
+Bin 14	Rp Referential NonGendered_theyPl	.{34}
+
+Bin 15	Rp Referential Gendered_he_congruent	.{41}
+
+Bin 16	Rp Referential Gendered_she_congruent	.{42}
+
+Bin 17	Rp Referential Gendered_they	.{43}
+
+Bin 18	Rp Referential Gendered_theyPl	.{44}
+
+Bin 19	Rp Referential Gendered_he_incongruent	.{45}
+
+Bin 20	Rp Referential Gendered_she_incongruent	.{46}
+
+
+TO BE COMBINED:
+Bins 5  & 6 
+Bins 9  & 10
+Bins 16 & 16
+Bins 19 & 20

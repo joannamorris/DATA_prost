@@ -1,0 +1,159 @@
+Bin 1
+RpGrAg_he
+.{11}
+
+Bin 2
+RpGrAg_she
+.{12}
+
+Bin 3
+RpGrAg_they
+.{13}
+
+Bin 4
+RpGrAg_theyPl
+.{14}
+
+Bin 5
+RpGrUg_he_congruent
+.{21}
+
+Bin 6
+RpGrUg_she_congruent
+.{22}
+
+Bin 7
+RpGrUg_they
+.{23}
+
+Bin 8
+RpGrUg_theyPl
+.{24}
+
+Bin 9
+RpGrUg_he_incongruent
+.{25}
+
+Bin 10
+RpGrUg_she_incongruent
+.{26}
+
+Bin 11
+RpSrAg_he
+.{31}
+
+Bin 12
+RpSrAg_she
+.{32}
+
+Bin 13
+RpSrAg_they
+.{33}
+
+Bin 14
+RpSrAg_theyPl
+.{34}
+
+Bin 15
+RpSrUg_he_congruent
+.{41}
+
+Bin 16
+RpSrUg_she_congruent
+.{42}
+
+Bin 17
+RpSrUg_they
+.{43}
+
+Bin 18
+RpSrUg_theyPl
+.{44}
+
+Bin 19
+RpSrUg_he_incongruent
+.{45}
+
+Bin 20
+RpSrUg_she_incongruent
+.{46}
+
+Bin 21
+NRpGrAg_he
+.{51}
+
+Bin 22
+NRpGrAg_she
+.{52}
+
+Bin 23
+NRpGrAg_they
+.{53}
+
+Bin 24
+NRpGrAg_theyPl
+.{54}
+
+Bin 25
+NRpGrUg_he_congruent
+.{61}
+
+Bin 26
+NRpGrUg_she_congruent
+.{62}
+
+Bin 27
+NRpGrUg_they
+.{63}
+
+Bin 28
+NRpGrUg_theyPl
+.{64}
+
+Bin 29
+NRpGrUg_he_incongruent
+.{65}
+
+Bin 30
+NRpGrUg_she_incongruent
+.{66}
+
+Bin 31
+NRpSrAg_he
+.{71}
+
+Bin 32
+NRpSrAg_she
+.{72}
+
+Bin 33
+NRpSrAg_they
+.{73}
+
+Bin 34
+NRpSrAg_theyPl
+.{74}
+
+Bin 35
+NRpSrUg_he_congruent
+.{81}
+
+Bin 36
+NRpSrUg_she_congruent
+.{82}
+
+Bin 37
+NRpSrUg_they
+.{83}
+
+Bin 38
+NRpSrUg_theyPl
+.{84}
+
+Bin 39
+NRpSrUg_he_incongruent
+.{85}
+
+Bin 40
+NRpSrUg_she_incongruent
+.{86}

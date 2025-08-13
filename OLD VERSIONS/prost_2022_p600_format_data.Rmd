@@ -1,0 +1,202 @@
+---
+title: 'The P600 for singular ''they'' v2:  P600 analyses for Centro-Parietal Electrode Sites'
+author: "Joanna Morris"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+fontsize: 10pt
+---
+\scriptsize
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      error = FALSE,
+                      comment = "||",
+                      fig.height = 4,
+                      fig.width = 4)
+options(width = 130)
+```
+
+# Setup and load files {-}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, fig.dim = c(4, 3))
+
+library(ggeffects)
+library(lme4)
+library(afex)
+library(gridExtra)
+library(emmeans)
+library(effectsize)
+library(performance)
+library(cowplot)  # for use with `plot_grid(x,x,ncol = x)` function
+library(e1071) # for use with `skewness()` function
+library(lmerTest)
+library(tidyverse)
+```
+
+Set `ggplot2` parameters
+```{r theme, echo = FALSE}
+theme_set(theme_classic() +  
+            theme(legend.position = "bottom", 
+                  axis.text=element_text(size=10),
+                  axis.title=element_text(size=9)))
+
+# Define a custom color palette
+my_palette <- c(  "#1F78B4","#E31A1C", "#33A02C")
+my_palette_1 <- c("#A6CEE3",  "#FB9A99")
+my_palette_2 <- c( "#1F78B4","#E31A1C" )
+my_palette_3 <- c("#A6CEE3","#1F78B4","#FB9A99","#E31A1C")
+
+
+
+# Create a function to apply this palette
+scale_color_custom <- function() {
+  scale_color_manual(values = my_palette_3)
+}
+
+scale_fill_custom <- function() {
+  scale_fill_manual(values = my_palette_3)
+}
+
+```
+
+This document contains the code to format the data required to conduct the statistical analyses for PROST project. It takes participants with more than 65% good data from Grusha's original datasets (2017), label all the variables, collapses over all the channels  and then creates a difference wave. The output files  are "prost202507_singular_p600.csv" and "prost202507_plural_p600.csv" 
+
+
+### Loading in and formatting the data
+
+(1) First we get the list of participants with more than 65% good data from Grusha's original datasets (2017)
+
+```{r}
+group2 <- read.table('group2_less_than_35_percent_data.txt', header = TRUE)
+group2$Group = "Binary"
+
+group3 <- read.table('group3and4_less_than_35_percent_data.txt', header = TRUE)
+group3$Group = "Non-binary"
+
+all_data = rbind(group2, group3)
+
+less_than_35_percent_subjs <- unique(all_data$ERPset)
+write.csv(less_than_35_percent_subjs
+          , "prost_subjlist_20250720.csv"
+          , row.names = FALSE)
+
+rm(all_data)
+rm(group2)
+rm(group3)
+
+```
+
+(1) Then we load in the data and label all the variables. 
+
+```{r}
+
+prost202507 <- read_csv('prost_mea_500800_202207.csv')
+
+
+centroparietal_channels  <- c('C3','Cz', 'C4', 'CP3', 'CPz', 'CP4', 'P3',  'Pz',  'P4')
+
+posterior_channels <- c('PZ','P4', 'P8', 'CP4', 'P7',  'P3',  'CP3', 'CPZ', 'TP7', 'TP8')
+
+nref_channels <- c('F3', 'Fz', 'F4', 'FC3', 'FCz', 'FC4', 'C3','Cz', 'C4', 'CP3', 'CPz', 'CP4', 'P3',  'Pz',  'P4')
+
+prost202507 <- dplyr::filter(prost202507, ERPset %in% less_than_35_percent_subjs)
+prost202507 <- dplyr::filter(prost202507, chlabel %in% posterior_channels )
+
+
+prost202507 <- dplyr::mutate(prost202507,
+                            SubjID = str_extract(prost202507$ERPset, "\\d{3}"))
+
+prost202507 <- dplyr::mutate(prost202507, 
+                            Referentiality = case_when(grepl("NonReferential"
+                                                             ,binlabel) ~ "NonReferential", 
+                                                       grepl("Referential"
+                                                             , binlabel) ~ "Referential"))
+
+prost202507 <- dplyr::mutate(prost202507, 
+                            Gender_Status = case_when(grepl("NonGendered"
+                                                            ,binlabel) ~ "NonGendered", 
+                                                       grepl("Gendered"
+                                                             , binlabel) ~ "Gendered"))
+
+prost202507 <- dplyr::mutate(prost202507, 
+                            Critical = case_when(grepl("Critical"
+                                                       ,binlabel) ~ "Critical",
+                                                 grepl("Baseline"
+                                                       , binlabel) ~ "Baseline"))
+
+prost202507 <- dplyr::mutate(prost202507, 
+                            Group = case_when(grepl("prost4"
+                                                    ,ERPset) ~ "NonBinary",
+                                              grepl("prost3"
+                                                    , ERPset) ~ "NonBinary",
+                                              grepl("prost2"
+                                                    , ERPset) ~ "Binary"))
+
+prost202507 <-dplyr::mutate(prost202507, 
+                            Number = case_when(grepl("himself_herself"
+                                                     ,binlabel) ~ "Singular",
+                                               grepl("themselves"
+                                                     , binlabel) ~ "Plural"))
+
+```
+
+
+(3) Then we collapse over the channels and gets difference scores
+
+```{r}
+# Collapse over all channels
+library(doBy)
+prost202507_2<- 
+  summaryBy(value ~ SubjID + Referentiality + Gender_Status + Critical + Group + Number
+            , data=prost202507)
+
+
+# get difference scores (Critical - Baseline)
+prost202507_3 <- 
+  pivot_wider(prost202507_2
+              , names_from = Critical
+              , values_from = value.mean)
+
+prost202507_3 <- 
+  mutate(prost202507_3
+         , diff_score = Critical - Baseline)
+```
+
+
+(4) Then we convert character vectors to factors
+
+```{r, results=FALSE}
+names <- c('Referentiality' ,'Gender_Status', 'Group', 'Number')
+prost202507_3[,names] <- lapply(prost202507_3[,names] , factor)
+str(prost202507_3)
+```
+
+(5) Then we re-order factor levels for *Referentiality*
+
+```{r}
+prost202507_3$Referentiality <- factor(prost202507_3$Referentiality, 
+                                            levels=c('Referential',
+                                                     'NonReferential'))
+levels(prost202507_3$Referentiality)
+```
+
+
+```{r}
+prost202507_singular <- dplyr::filter(prost202507_3, Number == "Singular") 
+prost202507_singular <- select( prost202507_singular, -Number)
+write_csv(prost202507_singular, "prost202507_singular_p600.csv")
+
+prost202507_plural <- dplyr::filter(prost202507_3, Number == "Plural")
+prost202507_plural <- select( prost202507_plural, -Number)
+write_csv(prost202507_plural, "prost202507_plural_p600.csv")
+
+```
+
+
